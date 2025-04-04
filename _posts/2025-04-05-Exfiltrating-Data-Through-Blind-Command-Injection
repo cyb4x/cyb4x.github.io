@@ -2,7 +2,7 @@
 layout: post
 title: Exfiltrating Data via Wget though a Blind Command injection
 date: 2025-04-05
-categories: blog
+categories: [blog]
 tags: [exfiltration, blind, commandinjection, wget]
 ---
 
