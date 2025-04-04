@@ -2,11 +2,10 @@
 layout: post
 title: Exfiltrating Data via Wget though a Blind Command injection
 date: 05-04-2025
-categories: [documentation]
+categories: [Techniques]
 tags: [exfiltration, blind, commandinjection, wget]
 ---
 
-# Exfiltrating Data via Wget though a Blind Command injection
 ![image](https://hackmd.io/_uploads/SymepiyW1x.png)
 
 ## Introduction
