@@ -16,9 +16,11 @@ timezone: Africa/Nairobi
 
 title: Said Hussein # the main title
 
-tagline: cyb4x-Red Teamer@infosec
-PNPT | CRTA | eJPT | ICCA   
-Specializing in offensive security, red teaming, and penetration testing. Sharing insights, writeups, and technical guides on infosec, CTFs, and adversary emulation.
+tagline: >-
+  cyb4x-Red Teamer@infosec  
+  PNPT | CRTA | eJPT | ICCA  
+  Specializing in offensive security, red teaming, and penetration testing.  
+  Sharing insights, writeups, and technical guides on infosec, CTFs, and adversary emulation.
 # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
