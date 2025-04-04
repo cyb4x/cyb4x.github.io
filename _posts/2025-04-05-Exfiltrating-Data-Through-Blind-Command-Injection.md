@@ -5,6 +5,7 @@ date: 05-04-2025
 categories: [Techniques]
 tags: [exfiltration, blind, commandinjection, wget]
 ---
+![Command Injection Preview](https://cdn.prod.website-files.com/642adcaf364024654c71df23/6769c0820cf95b3bdf630c2c_blog-visuals-state-of-command-injection-thumbnail-1_72f06fa981fd18b69cb65a075bae0a83.png)
 
 ![image](https://hackmd.io/_uploads/SymepiyW1x.png)
 
