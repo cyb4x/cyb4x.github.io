@@ -6,8 +6,6 @@ categories: [Techniques]
 tags: [exfiltration, blind, commandinjection, wget]
 image: "https://cdn.prod.website-files.com/642adcaf364024654c71df23/6769c0820cf95b3bdf630c2c_blog-visuals-state-of-command-injection-thumbnail-1_72f06fa981fd18b69cb65a075bae0a83.png"
 ---
-![Command Injection Preview](https://cdn.prod.website-files.com/642adcaf364024654c71df23/6769c0820cf95b3bdf630c2c_blog-visuals-state-of-command-injection-thumbnail-1_72f06fa981fd18b69cb65a075bae0a83.png)
-
 ## Introduction
 Hello, I’m cyb4x, a Red Team enthusiast with a focus on offensive security tactics. In this article, we’ll explore one such method: exfiltrating data using wget through blind command injection vulnerabilities. When a target system reveals a command injection flaw, it opens the door to remote code execution (RCE) without the need for complex exploits. I’ll walk you through the process of using wget to locate and extract valuable files, navigate the filesystem, and even access database contents, all while flying under the radar.
 
