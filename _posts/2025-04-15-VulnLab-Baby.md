@@ -168,7 +168,7 @@ expose %cyb4x% z:
 diskshadow /s vss.dsh
 ```
 
-![image](attachment:9bae947d-2427-40a8-9a2d-257f5a30472c:image)
+![image](https://www.notion.so/image/attachment%3A9bae947d-2427-40a8-9a2d-257f5a30472c%3Aimage.png?table=block&id=1d43d2c4-89f6-8004-a822-cee10cea7040&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
 
 Copying
 
