@@ -96,6 +96,9 @@ Nmap done: 1 IP address (1 host up) scanned in 670.17 seconds
 ## Enumeration
 
 ### LDAP
+> LDAP (Lightweight Directory Access Protocol) is a protocol used to access and manage directory services over a network. Think of it as a system that helps organize and retrieve data in a networked environment, similar to how a phonebook organizes contact information.
+{: .prompt-tip }
+
 After identifying that port 389 (LDAP) is open during initial scanning, I proceeded to enumerate the LDAP service. I started by checking for anonymous access, which was enabled and allowed me to retrieve useful domain information.
 
 **Anonymous Access**
@@ -121,6 +124,8 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectCla
 ![alt text](/assets/screenshots/baby/2.png)
 
 ### SMB
+> SMB (Server Message Block) is a network protocol used for providing shared access to files, printers, and other network resources in a network. It allows applications to read and write to files and request services from server programs in a computer network. 
+{: .prompt-tip }
 
 **SMB Password Spray**
 
