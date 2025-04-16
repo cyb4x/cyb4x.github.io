@@ -74,6 +74,7 @@ Nmap done: 1 IP address (1 host up) scanned in 670.17 seconds
 ## Enumeration
 
 ### LDAP
+After identifying that port 389 (LDAP) is open during initial scanning, I proceeded to enumerate the LDAP service. I started by checking for anonymous access, which was enabled and allowed me to retrieve useful domain information.
 
 **Anonymous Access**
 
@@ -88,7 +89,9 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectCla
 ```
 ![alt text](/assets/screenshots/baby/1.png)
 
-Descriptions
+**Descriptions**
+
+While exploring LDAP further, I queried the description attribute for all user objects to check if any sensitive information was stored there. It’s not uncommon for misconfigured environments to contain passwords or hints in user descriptions.
 
 ```bash
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "description:"
@@ -97,12 +100,17 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectCla
 
 ### SMB
 
+**SMB Password Spray**
+With the list of users gathered from LDAP and a password (`BabyStart123!`), I attempted a password spray attack using `nxc (nextExec)` over `SMB` to see if the credentials worked for any of the accounts. This approach tests one password across multiple usernames to `avoid account lockouts`.
+The spray resulted in a successful hit, but the response indicated `STATUS_PASSWORD_MUST_CHANGE`.This means the account is valid and the credentials are correct, but the user is forced to change the password on first login, a common situation for service accounts or newly created users.
+
 ```bash
 nxc smb 10.10.116.106 -u loots/users.txt -p 'BabyStart123!' --continue-on-success
 ```
 ![alt text](/assets/screenshots/baby/3.png)
 
 Password Change
+Proceeded to change the password using the smbpasswd utility.I authenticated with the current password and was prompted to set a new one. After successfully changing it to `NewSecurePass123!`, I re-tested access using `nxc`
 
 ```bash
 smbpasswd -r 10.10.116.106 -U Caroline.Robinson
@@ -112,25 +120,18 @@ smbpasswd -r 10.10.116.106 -U Caroline.Robinson
 
 ![alt text](/assets/screenshots/baby/5.png)
 
+This time, the login worked without issues. With valid credentials and no password change required, I now had authenticated access to the system as Caroline.Robinson, ready to enumerate further 
+
 ```bash
 nxc smb 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!' --users
 ```
 
 ![alt text](/assets/screenshots/baby/6.png)
 
-### Bloodhound
 
-```bash
-bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123!'  -ns 10.10.116.106 --zip
-```
-
-![alt text](/assets/screenshots/baby/7.png)
-
-First Degree Group Membership
-
-![alt text](/assets/screenshots/baby/8.png)
 
 ## Initial Access
+With the credentials for Caroline.Robinson confirmed and no further password restrictions, I attempted to gain a shell on the target using WinRM (Windows Remote Management). First, I tested connectivity using nxc to confirm WinRM was accessible with the current credentials:
 
 ```bash
 nxc winrm 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
@@ -144,7 +145,24 @@ evil-winrm -i 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
 
 ![alt text](/assets/screenshots/baby/10.png)
 
+
+
 ## PrivEsc
+
+### Bloodhound
+
+To identify potential privilege escalation paths, I used BloodHound via the bloodhound-python collector while authenticated as Caroline.Robinson. This tool is extremely useful in Active Directory environments to visualize relationships, permissions, and privilege chains.
+
+```bash
+bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123!'  -ns 10.10.116.106 --zip
+```
+
+![alt text](/assets/screenshots/baby/7.png)
+
+**First Degree Group Membership**
+ I noticed that the user Caroline.Robinson was a first-degree group member of Backup Operators, a built-in Windows group with special privileges. To confirm this manually, I checked the user privileges directly from the shell.The output confirmed that the user indeed had the SeBackupPrivilege assigned — a powerful privilege that can be abused to read arbitrary files, including the registry or even the NTDS.dit file, by backing them up and extracting sensitive data like hashes.
+
+![alt text](/assets/screenshots/baby/8.png)
 
 ![alt text](/assets/screenshots/baby/11.png)
 
