@@ -50,8 +50,10 @@ I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My m
 > [MyNmap](https://github.com/cyb4x/myNmap)  is a simplified wrapper for Nmap, designed to make network scanning quick and effortless. This tool is perfect for those who want to avoid writing long and complex Nmap commands. It abstracts away the intricacies of Nmap's syntax, allowing users to perform scans by specifying only the essentials.
 {: .prompt-tip }
  
-
 > [pass2ntlm](https://github.com/cyb4x/pass2ntlm) is a simple command-line Python utility that allows you to generate NTLM hashes from a password input. NTLM hashes are widely used in Windows authentication systems for storing and verifying passwords securely. This tool is designed to help penetration testers, security professionals, and developers.
+{: .prompt-tip }
+
+> [IOS](https://196.41.62.121/) – A campus-wide service management platform developed for the *Institute of Accountancy Arusha* and its campuses, streamlining several services online. With **three years** of continuous development and improvements, IOS has evolved into a crucial tool for managing services across the institute's network.
 {: .prompt-tip }
 
 ---
