@@ -4,7 +4,8 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-# Said Hussein (cyb4x)
+> 辞めるという選択肢はない
+{: .prompt-tip }
 
 > I'm Said Hussein, also known as cyb4x — a Red Team enthusiast with a strong focus on offensive security. My main interests revolve around penetration testing, bug hunting, and playing Capture The Flag (CTF) challenges.
 {: .prompt-tip }
@@ -27,5 +28,3 @@ order: 4
 
 💀 Break and Secure.
 
-> 辞めるという選択肢はない
-{: .prompt-tip }
