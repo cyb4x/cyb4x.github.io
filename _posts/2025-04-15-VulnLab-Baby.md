@@ -1,6 +1,6 @@
 ---
 layout: post
-title: VulnLab - Baby
+title: VulnLab - Baby Walkthrough
 date: 15-04-2025
 categories: [Machines]
 tags: [ldap, anonymous, SeBackupPrivilege, smbpasswd]
@@ -29,13 +29,12 @@ In this write-up, I’ll walk you through the Active Directory lab "Baby" from V
 {: .prompt-tip }
 
 ## Scanning
+```bash
+nmap -Pn -T4 -sC -sV -p- 10.10.116.106 -oN reports/all_tcp.txt
+```
 
 ```bash
-➜  Baby nmap -Pn -T4 -sC -sV -p- 10.10.116.106 -oN reports/all_tcp.txt
-Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-04-13 03:14 EAT
 Nmap scan report for 10.10.116.106 (10.10.116.106)
-Host is up (0.19s latency).
-Not shown: 65514 filtered tcp ports (no-response)
 PORT      STATE SERVICE       VERSION
 53/tcp    open  domain        Simple DNS Plus
 88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2025-04-13 00:24:14Z)
@@ -87,6 +86,11 @@ Host script results:
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 670.17 seconds
 
+```
+
+/etc/hosts
+```bash
+10.10.116.106    BabyDC.baby.vl
 ```
 
 ## Enumeration

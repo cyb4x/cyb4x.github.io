@@ -6,55 +6,36 @@ order: 4
 
 # 👨‍💻 Said Hussein (cyb4x)
 
-Hey! I'm **Said Hussein**, also known as **cyb4x** — a passionate Red Teamer and cybersecurity trainer with a strong background in offensive security, system exploitation, and CTFs. I spend my time hunting for vulnerabilities, building pentesting labs, mentoring students, and automating complex recon and exploitation workflows.
+Hey! I'm **Said Hussein**, also known as **cyb4x** — a Red Team enthusiast with a focus on offensive security.
 
 ---
 
 ## 🛡️ What I Do
 
-- **Red Teaming & Pentesting**  
-  Specialized in simulating adversarial attacks, including network exploitation, web app abuse, Active Directory (AD) compromise, privilege escalation, and lateral movement.
-
-- **Cybersecurity Field Training**  
-  I design practical, real-world scenarios to train future Red Teamers, helping them master topics like FTP exploitation, CMS abuse, RCE, and AD enumeration.
-
-- **Dev Work for CTF Platforms & Lab Infra**  
-  Skilled in Laravel, Python, and Bash — I create custom tools, scripts, and modules for user management, fingerprint recognition, automated wordlist generation, and more.
-
----
-
-## 🧰 Tools I Often Use
-
-- `evil-winrm`, `netexec`, `secretsdump`, `BloodHound`, `Nmap`, `Burp Suite`, `Impacket`, and custom scripts for enumeration and attack automation.
-- I frequently build workflows using `robocopy`, `reg.exe`, `diskshadow`, and other native Windows tools for stealthy extraction of NTDS.dit, SYSTEM hives, and more.
-
+- **Pentesting**
+- **Playing CTF**
 ---
 
 ## 📂 Current Projects
 
-- Building a **University Management System** in Laravel, with advanced modules for examination logistics, venue allocation, student biometrics, and feedback management.
-- Developing **automated brute-force and registration bots** with multithreaded Python scripts, CSRF handling, and real-time progress indicators.
-- Conducting **Active Directory forensics** and database breach simulations in controlled training environments.
+### 🔹 [MyNmap](https://github.com/cyb4x/myNmap)  
+**MyNmap** is a simplified wrapper for Nmap, designed to make network scanning quick and effortless. This tool is perfect for those who want to avoid writing long and complex Nmap commands. It abstracts away the intricacies of Nmap's syntax, allowing users to perform scans by specifying only the essentials.
+
+### 🔹 [pass2ntlm](https://github.com/cyb4x/pass2ntlm)  
+**pass2ntlm** is a simple command-line Python utility that allows you to generate NTLM hashes from a password input. NTLM hashes are widely used in Windows authentication systems for storing and verifying passwords securely. This tool is designed to help penetration testers, security professionals, and developers.
 
 ---
 
-## 🎯 Philosophy
-
-> *“Train like it’s real, hack like it’s war.”*
-
-I believe in combining deep technical expertise with practical exposure. Whether it’s a VulnLab machine, HackTheBox challenge, or an internal red team engagement, I aim to learn and teach through real-world simulations that sharpen both the mind and hands.
-
----
 
 ## 📫 Get In Touch
 
 - GitHub: [cyb4x](https://github.com/cyb4x)
-- Discord: **cyb4x#xxxx** (if you want to include it)
-- Email: *[Add your preferred contact]*
+- Discord: **cyb4x**
+- Linkedin: [Said Hussein](https://www.linkedin.com/in/said-hussein-53ba8127b/)
 
 ---
 
-Thanks for stopping by. 💀 Let’s break things, learn things, and secure things — together.
+💀 Break and Secure.
 
-> Add Markdown syntax content to file `_tabs/about.md`{: .filepath } and it will show up on this page.
+> 辞めるという選択肢はない
 {: .prompt-tip }

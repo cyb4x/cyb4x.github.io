@@ -16,5 +16,5 @@ Blind command injection is a security vulnerability that allows an attacker to e
 ### Identifying Command Injection (Blind) Vulnerabilities
 Command injection vulnerabilities typically arise when an application improperly handles user input, passing it directly into a command executed on the operating system without proper sanitization. An attacker might identify this type of vulnerability by testing inputs with symbols like ;, &&, or |, which can chain or initiate additional commands. If the application is vulnerable to blind injection, it may not display the output, but other observable indicators like server delays or altered responses may hint that commands are being processed in the background. Careful testing, including trial commands that generate a detectable result (e.g., adding a delay with sleep), can help to confirm the existence of blind injection.
 
-> Coming soon!
+> Continuing soon!
 {: .prompt-tip }
