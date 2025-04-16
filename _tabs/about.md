@@ -53,7 +53,7 @@ I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My m
 > [pass2ntlm](https://github.com/cyb4x/pass2ntlm) is a simple command-line Python utility that allows you to generate NTLM hashes from a password input. NTLM hashes are widely used in Windows authentication systems for storing and verifying passwords securely. This tool is designed to help penetration testers, security professionals, and developers.
 {: .prompt-tip }
 
-> [IOS](https://196.41.62.121/) – A campus-wide service management platform developed for the *Institute of Accountancy Arusha* and its campuses, streamlining several services online. With **three years** of continuous development and improvements, IOS has evolved into a crucial tool for managing services across the institute's network.
+> [IOS](https://reducted.com/) – A campus-wide service management platform developed for the *Institute of Accountancy Arusha* and its campuses, streamlining several services online. With **three years** of continuous development and improvements, IOS has evolved into a crucial tool for managing services across the institute's network.
 {: .prompt-tip }
 
 ---
