@@ -11,6 +11,24 @@ image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZ
 
 In this write-up, I’ll walk you through the Active Directory lab "Baby" from Vulnlab, a solo Windows machine designed for junior-level users exploring Active Directory exploitation. The lab focuses on two fundamental techniques: LDAP enumeration, which involves querying the domain for information about users, groups, and other AD objects, and Windows privilege escalation through the abuse of SeBackupPrivilege, a misconfigured right that can be leveraged to gain SYSTEM-level access. 
 
+## Active Directory Overview
+**Active Directory**
+
+> Active Directory (AD) is a directory service by Microsoft that stores information about objects on the network, including users, groups, and computers.To identify Active Directory (AD) on a network using Nmap, you can scan for common AD-related ports such as LDAP (Port 389), LDAPS (Port 636), Kerberos (Port 88), SMB (Port 445), and DNS (Port 53). Running a command like nmap -p 389,636,88,445,53 --script=default,smb-os-fingerprint <target_ip_range>
+{: .prompt-tip }
+
+**Tools Breakdown**
+
+> NetExec(nxc): network execution tool for interacting with various services remotely, supporting protocols like VNC, SSH, WINRM, MSSQL, FTP, LDAP, RDP, WMI, NFS, SMB. It allows for remote code execution and service interaction using valid credentials across different network protocols.
+
+> BloodHound: A tool for Active Directory enumeration that maps out attack paths and privilege escalation opportunities in AD environments.
+{: .prompt-tip }
+
+> Evil-WinRM: A tool to remotely access Windows machines via WinRM using valid credentials for shell access.
+{: .prompt-tip }
+
+{: .prompt-tip }
+
 ## Scanning
 
 ```bash
