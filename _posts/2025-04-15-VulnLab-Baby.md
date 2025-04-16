@@ -2,7 +2,7 @@
 layout: post
 title: VulnLab - Baby
 date: 15-04-2025
-categories: [Machines/VulnLab/Windows]
+categories: [Machines]
 tags: [ldap, anonymous, SeBackupPrivilege, smbpasswd]
 image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZRBo0W6Rd5ARdznbE/https/assets.vulnlab.com/baby_slide.png?format=webp&quality=lossless"
 ---
@@ -20,13 +20,12 @@ In this write-up, I’ll walk you through the Active Directory lab "Baby" from V
 **Tools Breakdown**
 
 > NetExec(nxc): network execution tool for interacting with various services remotely, supporting protocols like VNC, SSH, WINRM, MSSQL, FTP, LDAP, RDP, WMI, NFS, SMB. It allows for remote code execution and service interaction using valid credentials across different network protocols.
+{: .prompt-tip }
 
 > BloodHound: A tool for Active Directory enumeration that maps out attack paths and privilege escalation opportunities in AD environments.
 {: .prompt-tip }
 
 > Evil-WinRM: A tool to remotely access Windows machines via WinRM using valid credentials for shell access.
-{: .prompt-tip }
-
 {: .prompt-tip }
 
 ## Scanning
