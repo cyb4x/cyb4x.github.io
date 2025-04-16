@@ -7,6 +7,7 @@ tags: [ldap, anonymous, SeBackupPrivilege, smbpasswd]
 image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZRBo0W6Rd5ARdznbE/https/assets.vulnlab.com/baby_slide.png?format=webp&quality=lossless"
 ---
 
+## Intoduction
 In this write-up, I’ll walk you through the Active Directory lab "Baby" from Vulnlab, a solo Windows machine designed for junior-level users exploring Active Directory exploitation. The lab focuses on two fundamental techniques: LDAP enumeration, which involves querying the domain for information about users, groups, and other AD objects, and Windows privilege escalation through the abuse of SeBackupPrivilege, a misconfigured right that can be leveraged to gain SYSTEM-level access. 
 
 ## Scanning
@@ -196,4 +197,4 @@ Access as administrator
 ```
 evil-winrm -i 10.10.89.186 -u Administrator -H ee4457ae59f1e3fbd764e33d9cef123d
 ```
-![alt text](/assets/screenshots/baby/16.png)
+![alt text](/assets/screenshots/baby/17.png)
