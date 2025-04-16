@@ -18,15 +18,15 @@ I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My m
 > Offensive Security Specialist - Infosec (T) Limited
 > March 2025 - Present
 {: .prompt-tip }
-
+>
 > Cyber Security Trainer and Coach - Infosec (T) Limited
 > March 2025 - Present
 {: .prompt-tip }
-
+>
 > Red Team Intern - Infosec (T) Limited
 > September 2024 - March 2025
 {: .prompt-tip }
-
+>
 > Junior Linux System Administrator - Institute of Accountancy Arusha
 > July 2023 - Present
 {: .prompt-tip }
