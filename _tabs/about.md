@@ -7,8 +7,10 @@ order: 4
 > 辞めるという選択肢はない
 {: .prompt-tip }
 
-> I'm Said Hussein, also known as cyb4x — a Red Team enthusiast with a strong focus on offensive security. My main interests revolve around penetration testing, bug hunting, and playing Capture The Flag (CTF) challenges.
-{: .prompt-tip }
+<aside>
+I'm Said Hussein, also known as cyb4x — a Red Team enthusiast with a strong focus on offensive security. My main interests revolve around penetration testing, bug hunting, and playing Capture The Flag (CTF) challenges.
+</aside>
+
 ---
 
 ## Certifications 
