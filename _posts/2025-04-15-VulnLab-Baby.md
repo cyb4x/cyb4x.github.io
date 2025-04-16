@@ -2,7 +2,7 @@
 layout: post
 title: VulnLab - Baby
 date: 15-04-2025
-categories: [Machines]
+categories: [Machines/VulnLab/Windows]
 tags: [ldap, anonymous, SeBackupPrivilege, smbpasswd]
 image: "https://images-ext-1.discordapp.net/external/iTsNgpEcu1U88J1FvpyBi4VwhZZRBo0W6Rd5ARdznbE/https/assets.vulnlab.com/baby_slide.png?format=webp&quality=lossless"
 ---
@@ -175,8 +175,6 @@ To identify potential privilege escalation paths, I used BloodHound via the bloo
 ```bash
 bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123!'  -ns 10.10.116.106 --zip
 ```
-![alt text](/assets/screenshots/baby/9.png)
-
 
 ![alt text](/assets/screenshots/baby/7.png)
 
@@ -184,7 +182,11 @@ bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123
 
 I noticed that the user Caroline.Robinson was a first-degree group member of Backup Operators, a built-in Windows group with special privileges. To confirm this manually, I checked the user privileges directly from the shell.The output confirmed that the user indeed had the SeBackupPrivilege assigned — a powerful privilege that can be abused to read arbitrary files, including the registry or even the NTDS.dit file, by backing them up and extracting sensitive data like hashes.
 
+
 ![alt text](/assets/screenshots/baby/8.png)
+
+![alt text](/assets/screenshots/baby/9.png)
+
 
 ![alt text](/assets/screenshots/baby/11.png)
 
