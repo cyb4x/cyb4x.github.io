@@ -11,6 +11,20 @@ order: 4
 {: .prompt-tip }
 ---
 
+## Certifications 
+
+> TCM Security Practical Network Penetration Tester - PNPT
+{: .prompt-tip }
+
+> CWL Certified Red Team Analyst - CRTA
+{: .prompt-tip }
+
+> eLearnSecurity Junior Penetration Tester - eJPT
+{: .prompt-tip }
+
+> INE Certified Cloud Associate - ICCA
+{: .prompt-tip }
+
 ## Projects 
 
 > [MyNmap](https://github.com/cyb4x/myNmap)  is a simplified wrapper for Nmap, designed to make network scanning quick and effortless. This tool is perfect for those who want to avoid writing long and complex Nmap commands. It abstracts away the intricacies of Nmap's syntax, allowing users to perform scans by specifying only the essentials.
