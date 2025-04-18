@@ -31,9 +31,15 @@ Before jumping into the exploitation phase, let’s break down the two main conc
 
 **Group Policy Objects (GPOs)**
 > `GPOs` are a way for administrators to automate system settings across all machines in a domain sort of like pushing rules or configurations to every computer.Example: Enforcing a password policy (e.g., must be 12 characters long), Running a startup script on all domain-joined PCs, Disabling USB drives across the organization.
+{: .prompt-tip }
+
 > A `startup script` is a script (usually a batch file, PowerShell script, or executable) that runs automatically when a computer starts up, before any user logs in. In the context of Windows Active Directory, startup scripts are often deployed using Group Policy Objects (GPOs) to enforce system-wide behavior across multiple machines.Let’s say an IT admin wants every company laptop to Map a network drive, Install software updates, Run a security scan.
+{: .prompt-tip }
+
 >GPOs are powerful — but if misconfigured, they can be exploited. For instance, if a user or group has write access to a GPO that applies to an admin's machine, the attacker can inject a malicious script or command that runs with higher privileges.
 {: .prompt-tip }
+
+>Now that we have a clear understanding of what `ACLs` and `GPOs` are and why misconfigurations in these areas can pose serious security risks let’s dive into the lab and start the enumeration and exploitation process step by step.
 
 
 ## Scanning
