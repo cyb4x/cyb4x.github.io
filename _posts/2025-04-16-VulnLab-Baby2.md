@@ -108,6 +108,7 @@ Nmap done: 1 IP address (1 host up) scanned in 197.82 seconds
 ## Enumeration
 
 ### SMB
+We kick off our enumeration with `SMB`, a common file-sharing protocol in Windows environments. It’s often a good first step when targeting Windows machines, especially in Active Directory. Using the `NetExec` tool we tried authenticating as the Guest user a default account that sometimes has limited access.The authentication was successful, and we were able to enumerate SMB shares on the target. Notably, we had read access to shares like `homes` and `apps`.
 
 ```bash
 nxc smb 10.10.83.184 -u 'Guest' -p '' --shares
@@ -115,17 +116,24 @@ nxc smb 10.10.83.184 -u 'Guest' -p '' --shares
 
 ![alt text](/assets/screenshots/baby2/1.png)
 
-Got users
+Digging deeper into the accessible shares, I focused on the homes share. As expected in many AD environments, this share contained home directories for individual users — essentially their personal folders on the domain.
+
+By listing the contents of this share, I was able to enumerate several valid usernames, which is a critical step when working in an Active Directory environment. These usernames will later come in handy for targeted enumeration or potential attacks like password spraying.
 
 ![alt text](/assets/screenshots/baby2/2.png)
 
-Username as Password
+**Username as Password**
+With our list of usernames gathered from the homes share, we moved on to testing a common misconfiguration users setting their password to match their username.
+We used NetExec again, leveraging its `--no-bruteforce` flag to ensure we’re not hammering accounts and risking lockouts.
+
+This approach paid off — we successfully authenticated with two sets of credentials, `Carl.Moore:Carl.Moore` and `library:library`
 
 ```bash
 nxc smb 10.10.68.173 -u loots/users.txt -p loots/users.txt --continue-on-success --no-bruteforce
 ```
 
 ![alt text](/assets/screenshots/baby2/3.png)
+
 
 Enumerating Users
 
@@ -135,7 +143,10 @@ nxc smb 10.10.68.173 -u Carl.Moore -p Carl.Moore --users
 
 ![alt text](/assets/screenshots/baby2/4.png)
 
-### Bloodhound
+### Enumerating the Domain with BloodHound
+Now that we’ve obtained valid credentials (`Carl.Moore:Carl.Moore`), it’s a great time to collect domain information using `BloodHound`, a powerful tool for visualizing and analyzing Active Directory relationships and privilege escalation paths.
+
+We used `bloodhound-python` to perform a full collection of data from the domain.With the data imported into BloodHound, we’re ready to start analyzing our attack paths and identifying misconfigurations that can lead us to domain dominance.
 
 ```bash
 bloodhound-python -d baby2.vl  -c all -u 'Carl.Moore' -p 'Carl.Moore' -ns 10.10.68.173 --zip
@@ -143,29 +154,45 @@ bloodhound-python -d baby2.vl  -c all -u 'Carl.Moore' -p 'Carl.Moore' -ns 10.10.
 
 ![alt text](/assets/screenshots/baby2/5.png)
 
+While reviewing the BloodHound data, we identified that the user AMELIA.GRIFFITHS has a `logon script` (*a script that runs automatically when a user logs into a Windows domain.*) configured `\\baby2.vl\SYSVOL\baby2.vl\scripts\login.vbs`.This script is located in the `SYSVOL` share — a shared folder used by domain controllers to store public domain-wide resources, including `Group Policy scripts`. 
+
 ![alt text](/assets/screenshots/baby2/6.png)
 
+>The key point here is if this script is writable by low-privileged users, it could be used as a method of privilege escalation.Since logon scripts are executed automatically when a user logs in, modifying a script tied to a privileged user could lead to code execution as that user
+{: .prompt-tip }
+
 ## Initial Access
+We accessed the SYSVOL share to inspect the logon script and found `login.vbs` inside the scripts directory. 
 
-### Abusing Logon Script
+![alt text](/assets/screenshots/baby2/17.png)
 
-here
+After downloading it locally, we analyzed its contents and modified it to include a malicious payload:
+This payload uses PowerShell to download and execute a reverse shell from our attacker-controlled machine. 
 
 ![alt text](/assets/screenshots/baby2/7.png)
 
-here
+### Abusing Logon Script
+Before proceeding, we deleted the original login.vbs from the share to confirm write access. Once confirmed, we uploaded our modified version successfully.
 
 ![alt text](/assets/screenshots/baby2/8.png)
 
-dd
-
-Got a shell
+Meanwhile, we had already set up a `Python HTTP server` to host `notpad.ps1` (a PowerShell reverse shell script) and a Netcat listener to catch the connection. As soon as a user triggered the logon script, we received a reverse shell confirming successful exploitation of a writable `logon script via GPO misconfiguration`. To confirm which user the reverse shell was running as, we executed the following PowerShell command, which is similar to whoami `"$env:USERDOMAIN\$env:USERNAME"`
 
 ![alt text](/assets/screenshots/baby2/9.png)
 
 ## Privilege Escalation
+Back in BloodHound, we discovered that `AMELIA.GRIFFITHS` is a member of the `LEGACY@BABY2.VL` group. According to the analysis, members of this group have the `WriteDACL` permission on the user `GPOADM@BABY2.VL`.
 
 ### writeDACL
+>In Active Directory, every object (like a user, group, or computer) has a set of permissions that control who can do what to it. These permissions are stored in something called a DACL (Discretionary Access Control List). The WriteDACL permission means you can edit that list of permissions.
+{: .prompt-tip }
+
+>Imagine a VIP room that has a guest list at the door only people on the list can get in.Normally, only the manager can edit the guest list.But if you have WriteDACL, it's like having the power to walk up and add your name (or your friend’s name) to the VIP list.
+{: .prompt-tip }
+
+>In Active Directory terms, If you have `WriteDACL` over a user account like `GPOADM`, you can add your own account and give it full control over `GPOADM`. From there, you can do things like: Reset their password Or even impersonate them completely.
+{: .prompt-tip }
+
 
 ![alt text](/assets/screenshots/baby2/10.png)
 
