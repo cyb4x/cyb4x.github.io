@@ -20,6 +20,15 @@ Baby2 is a solo, intermediate-level Windows Active Directory machine that dives 
 >- Leveraging GPO-based privilege escalation 
 {: .prompt-tip }
 
+### Understanding the Concepts
+Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on — `Access Control Lists (ACLs)` and `Group Policy Objects (GPOs)` in a beginner-friendly way.
+
+**Access Control Lists (ACLs)**
+> An `Access Control List (ACL)` in Active Directory is essentially a set of permissions attached to an object, think of it as a list of `who can do what`. For example, imagine a shared folder in an office: 
+>- Alice might have permission to read files, Bob can edit them, and Charlie has full control, including read, write, and delete access. 
+>- Similarly, in Active Directory, ACLs define who can access, modify, or take control of objects like user accounts, groups, or computers. 
+{: .prompt-tip }
+
 ## Scanning
 ```bash
 nmap -Pn -T4 -sC -sV  -p53,88,135,139,389,445,464,593,636,3389,5985,9389,49664,49667,49669,49674,49676,63798,63782,63775  10.10.83.184 -oN reports/all_tcp.txt
