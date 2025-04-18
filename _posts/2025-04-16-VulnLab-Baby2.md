@@ -29,6 +29,15 @@ Before jumping into the exploitation phase, let’s break down the two main conc
 >- Similarly, in Active Directory, ACLs define who can access, modify, or take control of objects like user accounts, groups, or computers. 
 {: .prompt-tip }
 
+**Group Policy Objects (GPOs)**
+> `GPOs` are a way for administrators to automate system settings across all machines in a domain sort of like pushing rules or configurations to every computer.Example: Enforcing a password policy (e.g., must be 12 characters long), Running a startup script on all domain-joined PCs, Disabling USB drives across the organization.
+
+> A `startup script` is a script (usually a batch file, PowerShell script, or executable) that runs automatically when a computer starts up, before any user logs in. In the context of Windows Active Directory, startup scripts are often deployed using Group Policy Objects (GPOs) to enforce system-wide behavior across multiple machines.
+
+>GPOs are powerful — but if misconfigured, they can be exploited. For instance, if a user or group has write access to a GPO that applies to an admin's machine, the attacker can inject a malicious script or command that runs with higher privileges.
+{: .prompt-tip }
+
+
 ## Scanning
 ```bash
 nmap -Pn -T4 -sC -sV  -p53,88,135,139,389,445,464,593,636,3389,5985,9389,49664,49667,49669,49674,49676,63798,63782,63775  10.10.83.184 -oN reports/all_tcp.txt
