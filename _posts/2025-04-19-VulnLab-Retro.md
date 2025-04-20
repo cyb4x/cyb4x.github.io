@@ -6,12 +6,6 @@ categories: [Vulnlab]
 tags: [pre2k, changepasswd, adcs,ESC1, certipy]
 image: "https://assets.vulnlab.com/retro_slide.png"
 ---
-<aside>
-💡
-
-10.10.88.155
-
-</aside>
 
 ## Introduction
 
@@ -280,7 +274,7 @@ Confirm
 nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
 ```
 
-![alt text](/assets/screenshots/Retro/22.png)
+![alt text](/assets/screenshots/Retro/21.png)
 
 or we can request directly administartor
 
