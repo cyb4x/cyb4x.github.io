@@ -32,7 +32,7 @@ These two components are common in enterprise environments, and misconfiguration
 Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)` in a beginner-friendly way.
 
 **Access Control Lists (ACLs)**
-> An `Access Control List (ACL)` in Active Directory is essentially a set of permissions attached to an object, think of it as a list of `who can do what`. For example, imagine a shared folder in an office: 
+> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account — just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created, anyone who knows the account name and has the right credentials can potentially bind a new system to that account.
 >- Alice might have permission to read files, Bob can edit them, and Charlie has full control, including read, write, and delete access. 
 >- Similarly, in Active Directory, ACLs define who can access, modify, or take control of objects like user accounts, groups, or computers. 
 {: .prompt-tip }
