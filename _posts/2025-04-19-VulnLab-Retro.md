@@ -26,15 +26,17 @@ These two components are common in enterprise environments, and misconfiguration
 Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)` in a beginner-friendly way.
 
 **Pre-Created Computer Accounts**
-> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created(if the "*Assign this computer account as a pre-Windows 2000 computer*" checkbox is `enabled`)), the computer account is given a default, predictable password, the account name in lowercase.
->- For example, a computer account named `HRLaptop$` would have the password `hrlaptop`. 
+> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created(if the "*Assign this computer account as a pre-Windows 2000 computer*" checkbox is `enabled`)), the computer account is given a default, predictable password, the account name in lowercase. For example, a computer account named `HRLaptop$` would have the password `hrlaptop`. 
 {: .prompt-tip }
 
 **Active Directory Certificate Services (ADCS)**
 > `Active Directory Certificate Services (ADCS)` is a Windows Server role for issuing and managing `Public Key infrastructure (PKI)` certificates used in secure communication and authentication protocols.
+{: .prompt-tip }
 > `ADCS` is like a digital ID system in Windows networks. It lets users and devices request certificates (like ID cards) to prove who they are. These certificates are used for things like secure logins, encryption, and communication.But if it’s misconfigured, attackers can trick the system into giving them certificates for privileged users like `Administrator`.That means the attacker could log in as an `Administrator` using just a certificate, completely bypassing normal security checks.
+{: .prompt-tip }
 
 >Now that we’ve broken down and understood the key concepts of `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)`, let’s dive into the practical exploitation steps and see how these misconfigurations can be leveraged in Active Directory environment.
+{: .prompt-tip }
 
 ### Tools Breakdown
 > NetExec(nxc): network execution tool for interacting with various services remotely, supporting protocols like VNC, SSH, WINRM, MSSQL, FTP, LDAP, RDP, WMI, NFS, SMB. It allows for remote code execution and service interaction using valid credentials across different network protocols.
