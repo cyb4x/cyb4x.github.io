@@ -25,23 +25,16 @@ These two components are common in enterprise environments, and misconfiguration
 ### Understanding the Concepts
 Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)` in a beginner-friendly way.
 
-**Access Control Lists (ACLs)**
-> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account — just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created, anyone who knows the account name and has the right credentials can potentially bind a new system to that account.
->- Alice might have permission to read files, Bob can edit them, and Charlie has full control, including read, write, and delete access. 
->- Similarly, in Active Directory, ACLs define who can access, modify, or take control of objects like user accounts, groups, or computers. 
+**Pre-Created Computer Accounts**
+> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created(if the "*Assign this computer account as a pre-Windows 2000 computer*" checkbox is `enabled`)), the computer account is given a default, predictable password, the account name in lowercase.
+>- For example, a computer account named `HRLaptop$` would have the password `hrlaptop`. 
 {: .prompt-tip }
 
-**Group Policy Objects (GPOs)**
-> `GPOs` are a way for administrators to automate system settings across all machines in a domain sort of like pushing rules or configurations to every computer.Example: Enforcing a password policy (e.g., must be 12 characters long), Running a startup script on all domain-joined PCs, Disabling USB drives across the organization.
-{: .prompt-tip }
+**Active Directory Certificate Services (ADCS)**
+> `Active Directory Certificate Services (ADCS)` is a Windows Server role for issuing and managing `Public Key infrastructure (PKI)` certificates used in secure communication and authentication protocols.
+> `ADCS` is like a digital ID system in Windows networks. It lets users and devices request certificates (like ID cards) to prove who they are. These certificates are used for things like secure logins, encryption, and communication.But if it’s misconfigured, attackers can trick the system into giving them certificates for privileged users like `Administrator`.That means the attacker could log in as an `Administrator` using just a certificate, completely bypassing normal security checks.
 
-> A `startup script` is a script (usually a batch file, PowerShell script, or executable) that runs automatically when a computer starts up, before any user logs in. In the context of Windows Active Directory, startup scripts are often deployed using `Group Policy Objects (GPOs)` to enforce system-wide behavior across multiple machines.Let’s say an IT admin wants every company laptop to Map a network drive, Install software updates, Run a security scan.
-{: .prompt-tip }
-
->`GPOs` are powerful — but if misconfigured, they can be exploited. For instance, if a user or group has write access to a `GPO` that applies to an admin's machine, the attacker can inject a malicious script or command that runs with higher privileges.
-{: .prompt-tip }
-
->Now that we have a clear understanding of what `ACLs` and `GPOs` are and why misconfigurations in these areas can pose serious security risks let’s dive into the lab and start the enumeration and exploitation process step by step.
+>Now that we’ve broken down and understood the key concepts of `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)`, let’s dive into the practical exploitation steps and see how these misconfigurations can be leveraged in Active Directory environment.
 
 ### Tools Breakdown
 > NetExec(nxc): network execution tool for interacting with various services remotely, supporting protocols like VNC, SSH, WINRM, MSSQL, FTP, LDAP, RDP, WMI, NFS, SMB. It allows for remote code execution and service interaction using valid credentials across different network protocols.
@@ -53,10 +46,10 @@ Before jumping into the exploitation phase, let’s break down the two main conc
 > BloodHound: is a tool for Active Directory enumeration that maps out attack paths and privilege escalation opportunities in AD environments.
 {: .prompt-tip }
 
-> PowerView: is a PowerShell tool used for Active Directory enumeration and exploitation. It allows attackers to gather information about AD domains, manipulate permissions, and escalate privileges. In this lab, PowerView was used to manipulate DACLs (Discretionary Access Control Lists) and change the password of the gpoadm account.
+> 
 {: .prompt-tip }
 
-> pyGPOAbuse: is a Python script used to abuse misconfigured Group Policy Objects (GPOs). In this lab, it was used to add the gpoadm user to the local administrators group, giving us elevated privileges.
+> 
 {: .prompt-tip }
 
 > Impacket Secretsdump:  tool from the Impacket suite that is used to dump credentials, hashes, and other sensitive information from Windows machines.
@@ -112,7 +105,7 @@ Nmap done: 1 IP address (1 host up) scanned in 174.34 seconds
 
 ### SMB
 
-Guest access
+After running an Nmap scan, we identified several ports commonly seen in Active Directory environments. We began our enumeration with SMB, which revealed `Guest` access was enabled with an `empty password`. While browsing the available shares, we discovered that the Trainees share was readable.
 
 ```powershell
 nxc smb 10.10.79.94 -u 'Guest' -p '' --shares
@@ -120,11 +113,11 @@ nxc smb 10.10.79.94 -u 'Guest' -p '' --shares
 
 ![alt text](/assets/screenshots/Retro/1.png)
 
-Access share with read permission
+Inside, we found a file named `Important.txt` a message from the admins stating they had *bundled their accounts into one* because they were tired of constantly resetting forgotten passwords. This strongly `hinted at a weak or default credential setup`, possibly using usernames like `trainee` or `trainees` with passwords matching the usernames (e.g., `trainee:trainee`).
 
 ![alt text](/assets/screenshots/Retro/2.png)
 
-users enumeration
+To confirm our suspicion of weak credentials, we used `Kerbrute` for user enumeration This revealed a valid user account `trainee`.
 
 ```powershell
 kerbrute userenum  -d retro.vl  --dc 10.10.79.94  -t 100 wordlists/userslist.txt
@@ -132,7 +125,7 @@ kerbrute userenum  -d retro.vl  --dc 10.10.79.94  -t 100 wordlists/userslist.txt
 
 ![alt text](/assets/screenshots/Retro/3.png)
 
-got a hit using netxec username as password
+We then tested common password patterns using `NetExec (nxc)`, where we assumed the `username` might be `used as` the `password`. And it worked! 
 
 ```powershell
 nxc smb 10.10.79.94 -u loots/users.txt -p loots/users.txt  --no-bruteforce --continue-on-success
