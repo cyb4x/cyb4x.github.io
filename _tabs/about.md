@@ -19,7 +19,7 @@ I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My m
 > *[March 2025 - Present]*
 {: .prompt-tip }
 >
-> Cyber Security Trainer and Coach - Infosec (T) Limited
+> Cyber Security Trainer and Coach - Infosec Academy
 > *[March 2025 - Present]*
 {: .prompt-tip }
 >

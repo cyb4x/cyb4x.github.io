@@ -2,7 +2,7 @@
 layout: post
 title: VulnLab - Baby2 Walkthrough
 date: 16-04-2025
-categories: [Machines]
+categories: [Vulnlab]
 tags: [misconfigurations, ACLs, GPOs, guest]
 image: "https://assets.vulnlab.com/baby2_slide.png"
 ---
