@@ -363,12 +363,3 @@ This lab demonstrated how seemingly low-privileged accounts like machine account
 
 
 
-
-
-now lets share to linkedin
-this was my last post
-I’m kicking off a series on Active Directory exploitation, starting with standalone machines, moving through chains, and diving into Red Team labs from Vulnlab. I have already posted walkthroughs for the first two machines, Baby and Baby2. Check them out on my blog and stay tuned for more!
-
-Check them out on my blog: https://cyb4x.github.io/
-
-hashtag#ActiveDirectory hashtag#RedTeam hashtag#Vulnlab hashtag#CyberSecurity hashtag#Pentesting hashtag#WindowsSec
