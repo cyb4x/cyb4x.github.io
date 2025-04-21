@@ -15,11 +15,11 @@ Today, we're diving into the next lab in the series `Retro`.
 
 `Retro` is a solo, junior-level Windows Active Directory machine that introduces new attack paths involving `Pre-created Computer Accounts` and the powerful, often-overlooked `Active Directory Certificate Services (ADCS)`.
 
-These two components are common in enterprise environments, and misconfigurations here can open doors to full domain compromise — even without high initial privileges.
+These two components are common in enterprise environments, and misconfigurations here can open doors to full domain compromise even without high initial privileges.
 
 > By the end of this lab, you’ll have hands-on experience with:
->- Enumerating and abusing pre-created machine accounts
->- Exploiting misconfigured ADCS for privilege escalation 
+>- Enumerating and abusing `pre-created machine accounts`
+>- Exploiting misconfigured `ADCS` for privilege escalation 
 {: .prompt-tip }
 
 ### Understanding the Concepts
@@ -324,7 +324,7 @@ Once we had a valid certificate and successfully authenticated as the `DC$` (`Do
 
 This step allows us to dump password hashes of all users in the domain, including privileged accounts like `krbtgt` and `Administrator`, which is a critical part of post-exploitation.
 
-### Dumped the secrets
+### Dumping secrets
 
 ```powershell
 secretsdump.py retro.vl/'DC$'@10.10.79.94 -hashes aad3b435b51404eeaad3b435b51404ee:532f3be569a64881ec82f1cc875059e3
