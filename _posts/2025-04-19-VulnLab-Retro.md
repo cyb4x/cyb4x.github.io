@@ -196,6 +196,9 @@ export KRB5CCNAME=loots/tickets/banking.ccache
 
 ![alt text](/assets/screenshots/Retro/10.png)
 
+> A `TGT` is like a "`hall pass`" in Active Directory. When you log in, the `Domain Controller` gives you a `TGT` that proves your identity. You can then use it to `request` access to other services (like `SMB`, `LDAP`, etc.) `without re-entering your password each time`. It's part of the `Kerberos authentication` process.
+{: .prompt-tip }
+
 After discovering the pre-created computer account `BANKING$ `and obtaining a valid `TGT`, we wanted to confirm whether we could use it to authenticate. We first tested the `TGT` we extracted earlier using `netexec`, This confirmed that we had valid access using the ticket.
 ```powershell
 nxc smb 10.10.79.94 --use-kcache
@@ -227,9 +230,12 @@ nxc smb 10.10.79.94 -u "BANKING$" -p 'Password123!'
 
 ![alt text](/assets/screenshots/Retro/14.png)
 
-With valid access confirmed using both TGT and password, we’re now ready to move to the next stage in the attack chain.
+With valid access confirmed using both TGT and password, we’re now ready to move to the next stage in the attack chain. We'll be switching between using the `TGT` and the `password`. This helps demonstrate how both methods work in real scenarios.
 
-ADCS
+### ADCS Enumeration
+we continued enumeration using `netexec` to check if `Active Directory Certificate Services (ADCS)` was deployed in the environment and the output revealed the presence of a certificate authority named `retro-DC-CA`.
+
+Using `nextexec`
 
 ```powershell
 nxc ldap 10.10.79.94 --use-kcache -M adcs
@@ -237,7 +243,7 @@ nxc ldap 10.10.79.94 --use-kcache -M adcs
 
 ![alt text](/assets/screenshots/Retro/15.png)
 
-Using Certipy
+Using `Certipy`
 
 ```powershell
 certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -debug
@@ -245,7 +251,11 @@ certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -debug
 
 ![alt text](/assets/screenshots/Retro/16.png)
 
-Find Vulnerable Templates
+**Find Vulnerable Templates**
+
+After identifying that `ADCS` was running (`retro-DC-CA`), we moved forward to check for vulnerable certificate templates these are configurations within `ADCS` that, if misconfigured, can allow low-privileged users (or even computer accounts) to request certificates impersonating privileged accounts (like `Domain Admins`).
+
+This checks for templates that are known to be vulnerable like (Allow low-privileged users or machine accounts to request certificates, Allow client authentication, Don't require manager approval or certificate request signing).
 
 ```powershell
 certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -stdout -vulnerable
@@ -255,9 +265,19 @@ certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -stdout -vulne
 
 ![alt text](/assets/screenshots/Retro/18.png)
 
+we discovered that one of the templates was vulnerable to `ESC1` Escalation.
+**What is `ESC1`?**
+> Imagine you're trying to prove who you are online, and one way to do that is by showing a certificate — like a digital ID card. Normally, this certificate is tied to a specific user (like you) and confirms that you're who you say you are.Now, `ESC1` is a flaw in how certain certificates are issued. It allows someone to trick the system into giving them a certificate for another user (like a Domain Admin) instead of themselves, even if they don't have the right to do that.
+{: .prompt-tip }
+
+>In a vulnerable setup, an attacker with low-level access (like a regular user) could use this flaw to request a certificate that makes them look like a Domain Admin or another important user. They could then use this certificate to login as that higher-privileged user and gain unauthorized access.
+{: .prompt-tip }
+
 ## Initial access
 
-Exploting ESC1
+### Exploting ESC1
+
+By default, the certificate request using this vulnerable template returns a .pfx file for the DC$ account. This certificate can then be used to perform a DCSync attack against the domain controller itself — allowing us to extract sensitive credentials like password hashes.
 
 ```powershell
 certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.79.94' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -debug
@@ -265,9 +285,15 @@ certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.79.94' -ca 'retro-DC-C
 
 ![alt text](/assets/screenshots/Retro/19.png)
 
+```powershell
+certipy auth -pfx dc.pfx -domain retro.vl
+```
+
+This give use `NTLM` hash for `DC$`
+
 ![alt text](/assets/screenshots/Retro/20.png)
 
-Confirm
+To confirm it works, we can use netexec with the NT hash obtained after authentication.
 
 ```powershell
 nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
@@ -275,21 +301,33 @@ nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
 
 ![alt text](/assets/screenshots/Retro/21.png)
 
-or we can request directly administartor
+Alternatively, as many attackers prefer, we can also manually specify a different user, such as `administrator`, in the request. This way, we directly obtain a certificate to authenticate as a `Domain Admin`.
 
 ```powershell
 certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.73.65' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -upn 'administrator@retro.vl'
 ```
 
+then
+
+```powershell
+certipy auth -pfx administrator.pfx -domain retro.vl
+```
+
 ## Privilege Escalation
 
-dumped the secrets
+Once we had a valid certificate and successfully authenticated as the `DC$` (`Domain Controller machine account`), we had the ability to perform `DCSync` or extract secrets from the domain controller using tools like `secretsdump.py`.
+
+This step allows us to dump password hashes of all users in the domain, including privileged accounts like `krbtgt` and `Administrator`, which is a critical part of post-exploitation.
+
+### Dumped the secrets
 
 ```powershell
 secretsdump.py retro.vl/'DC$'@10.10.79.94 -hashes aad3b435b51404eeaad3b435b51404ee:532f3be569a64881ec82f1cc875059e3
 ```
 
 ![alt text](/assets/screenshots/Retro/23.png)
+
+This gave us a full dump of user credentials, including password hashes. These can be cracked offline or used in pass-the-hash attacks to impersonate other users and move laterally within the network.
 
 ## References
 
