@@ -317,9 +317,9 @@ In this lab, we started by enumerating `SMB` shares to discover user information
 
 [NetExec Cheatsheet](https://seriotonctf.github.io/2024/03/07/CrackMapExec-and-NetExec-Cheat-Sheet/)
 
-[Logon script | The Hacker Recipes](https://www.thehacker.recipes/ad/movement/dacl/logon-script)
+[Logon script](https://www.thehacker.recipes/ad/movement/dacl/logon-script)
 
-[Abusing AD-DACL: WriteDacl - Hacking Articles](https://www.hackingarticles.in/abusing-ad-dacl-writedacl/)
+[Abusing AD-DACL WriteDacl](https://www.hackingarticles.in/abusing-ad-dacl-writedacl/)
 
 [GPO Abuse Explained](https://www.semperis.com/blog/group-policy-abuse-explained/)
 
