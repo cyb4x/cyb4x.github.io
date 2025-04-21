@@ -338,6 +338,15 @@ This gave us a full dump of user credentials, including password hashes. These c
 evil-winrm -i retro.vl -u Administrator -H 252fac7066d93dd009d4fd2cd0368389
 ```
 
+## Wrap-Up
+In this lab, we started by identifying `pre-created computer accounts` in the domain. Using `NetExec`, we authenticated with one of them (`BANKING$`) and successfully obtained a `Ticket Granting Ticket (TGT)`. This gave us two useful access methods via `TGT` and the machine password helping us understand how both can be leveraged for lateral movement and enumeration.
+
+We then discovered that `Active Directory Certificate Services (ADCS)` was deployed in the environment. Using `Certipy`, we found a certificate template vulnerable to `ESC1`. This enabled us to request a certificate as another user such as the Domain Controller account (`DC$`) or even the `Administrator`.
+
+With the generated `.pfx` certificate, we authenticated as a privileged user and performed a `DCSync` attack using `Impacket's secretsdump`, successfully dumping password hashes from the `Domain Controller`.
+
+This lab demonstrated how seemingly low-privileged accounts like machine accounts can be escalated through ADCS misconfigurations, leading to full domain compromise.
+
 ## References
 
 [NetExec Cheatsheet](https://seriotonctf.github.io/2024/03/07/CrackMapExec-and-NetExec-Cheat-Sheet/)
@@ -352,3 +361,14 @@ evil-winrm -i retro.vl -u Administrator -H 252fac7066d93dd009d4fd2cd0368389
 
 [Certipy](https://github.com/ly4k/Certipy)
 
+
+
+
+
+now lets share to linkedin
+this was my last post
+I’m kicking off a series on Active Directory exploitation, starting with standalone machines, moving through chains, and diving into Red Team labs from Vulnlab. I have already posted walkthroughs for the first two machines, Baby and Baby2. Check them out on my blog and stay tuned for more!
+
+Check them out on my blog: https://cyb4x.github.io/
+
+hashtag#ActiveDirectory hashtag#RedTeam hashtag#Vulnlab hashtag#CyberSecurity hashtag#Pentesting hashtag#WindowsSec
