@@ -8,7 +8,7 @@ order: 4
 > 辞めるという選択肢はない
 
 <aside>
-I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My main interests revolve around penetration testing, bug hunting, and playing Capture The Flag (CTF) challenges.
+I'm cyb4x, a Offensive Security enthusiast with a strong focus on Penetration Testing, Application Security and Red Teaming.
 </aside>
 
 ---
@@ -59,6 +59,7 @@ I'm cyb4x, a Red Team enthusiast with a strong focus on offensive security. My m
 ---
 
 - Linkedin: [Said Hussein](https://www.linkedin.com/in/said-hussein-53ba8127b/)
+- Github: [Said Hussein - cyb4x](https://github.com/cyb4x/)
 
 ---
 
