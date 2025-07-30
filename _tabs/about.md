@@ -28,7 +28,7 @@ I'm cyb4x, a Offensive Security enthusiast with a strong focus on Penetration Te
 {: .prompt-tip }
 >
 > Junior Linux System Administrator - Institute of Accountancy Arusha
-> *[July 2023 - Present]*
+> *[July 2023 - July 2025]*
 {: .prompt-tip }
 
 ## Certifications 
