@@ -44,7 +44,7 @@ I'm cyb4x, a Offensive Security enthusiast with a strong focus on Penetration Te
 > 
 > eLearnSecurity Junior Penetration Tester - eJPT
 {: .prompt-tip }
-
+>
 > INE Certified Cloud Associate - ICCA
 {: .prompt-tip }
 
